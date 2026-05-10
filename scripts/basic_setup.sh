@@ -3,7 +3,7 @@
 # For the VM you NEED to run as root, otherwise this wont work
 if [ "$EUID" -ne 0 ]; then
   echo "Run with sudo: sudo $0"
-  echo "Use 'sudo -i' to get a root shell and then run the script. You will get 'root@test-vm:~# '"
+  echo "Use 'sudo -i' to get a root shell and then run the script. You will get 'root@pitwall-vm:~# '"
   exit 1
 fi
 
@@ -21,7 +21,6 @@ ufw --force enable
 # Setup Docker Apt repository (this is from Docker's official installation instructions for Ubuntu)
 
 # Add Docker's official GPG key:
-apt install ca-certificates curl
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
@@ -37,6 +36,7 @@ Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
 # Install Docker Engine
+apt update
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Verify Docker is running
