@@ -91,7 +91,7 @@ EOL
 # Run the containers
 docker-compose up -d --build
 
-echo "Containers created and running. Access the FastAPI app at http://localhost:8000"
+echo "Containers created and running. Access the FastAPI app at curl http://localhost:8000"
 echo "To stop the containers, run: docker-compose down"
 echo "To view logs, run: docker-compose logs -f"
 echo "To access the database, run: docker exec -it postgres_db psql -U postgres -d f1_telemetry"

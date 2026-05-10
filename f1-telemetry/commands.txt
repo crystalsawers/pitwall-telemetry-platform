@@ -1,0 +1,82 @@
+# =========================
+# PHASE 1 - START SYSTEM
+# =========================
+
+# Build and start everything (FastAPI + Postgres)
+docker compose up --build -d
+
+# Check running containers
+docker ps
+
+# =========================
+# FASTAPI TESTS
+# =========================
+
+# Check API is alive
+curl http://localhost:8000/
+
+# Check Postgres connection via API
+curl http://localhost:8000/db-test
+
+# Create telemetry table
+curl -X POST http://localhost:8000/telemetry/init
+
+# Insert sample telemetry data
+curl -X POST http://localhost:8000/telemetry/add
+
+# Fetch telemetry data
+curl http://localhost:8000/telemetry
+
+# =========================
+# LOGGING / DEBUGGING
+# =========================
+
+# FastAPI logs
+docker logs fastapi_app
+
+# Postgres logs
+docker logs postgres_db
+
+# Live logs (follow mode)
+docker compose logs -f
+
+# FastAPI only logs
+docker compose logs -f fastapi_app
+
+# Postgres only logs
+docker compose logs -f postgres_db
+
+# =========================
+# SYSTEM CONTROL
+# =========================
+
+# Stop containers (keep data)
+docker compose stop
+
+# Start again
+docker compose start
+
+# Stop and remove containers
+docker compose down
+
+# Stop and remove EVERYTHING (including DB volume)
+docker compose down -v
+
+# Rebuild after code changes
+docker compose up --build -d
+
+# Restart without rebuild
+docker compose restart
+
+# =========================
+# DATABASE DEBUG (optional)
+# =========================
+
+# Enter Postgres container
+docker exec -it postgres_db psql -U postgres -d f1_telemetry
+
+# List tables
+\dt
+
+# View telemetry table
+SELECT * FROM telemetry;

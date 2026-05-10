@@ -16,6 +16,8 @@ apt install -y git curl ufw ca-certificates
 ufw allow OpenSSH
 ufw allow 80/tcp
 ufw allow 443/tcp
+ufw allow 8000/tcp
+ufw allow 5432/tcp
 ufw --force enable
 
 # Setup Docker Apt repository (this is from Docker's official installation instructions for Ubuntu)
