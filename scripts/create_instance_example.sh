@@ -1,5 +1,49 @@
 #!/bin/bash
 
+# Setup Google Cloud CLI Install if not already installed
+
+if ! command -v gcloud >/dev/null 2>&1; then
+  echo "gcloud not found. Installing Google Cloud CLI..."
+
+  sudo apt-get update
+  sudo apt-get install -y apt-transport-https ca-certificates gnupg curl
+
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+
+  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+    | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+
+  sudo apt-get update && sudo apt-get install -y google-cloud-cli
+fi
+
+# Authenticate Google Cloud CLI if not already authenticated.
+#
+# INTERACTIVE MODE (default for local machines):
+# - Uses browser login via:
+#   gcloud auth login
+#
+# NON-INTERACTIVE MODE (servers / no browser / automation):
+# - Requires a Service Account JSON key file
+# - To create it:
+#   1. Go to Google Cloud Console
+#   2. IAM & Admin → Service Accounts
+#   3. Select or create a service account
+#   4. Go to "Keys" tab
+#   5. Click "Add Key" → "Create new key"
+#   6. Choose JSON → download file
+#   7. Place it locally (e.g. ./service-account.json)
+#
+# Then replace this block with:
+#   gcloud auth activate-service-account --key-file=./service-account.json
+
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q "@"; then
+  echo "No active gcloud authentication detected. Starting login..."
+  gcloud auth login
+fi
+
+
+
 # Create Google Cloud Compute Engine instance for Pitwall Telemetry Platform
 
 # Set variables (replace placeholders before running)
@@ -15,6 +59,8 @@ DISK_TYPE="pd-balanced"
 NETWORK="default"
 SERVICE_ACCOUNT="your-service-account@your-project.iam.gserviceaccount.com"
 SCOPES="https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/trace.append"
+
+gcloud config set project $PROJECT_ID
 
 # Create the instance
 gcloud compute instances create $INSTANCE_NAME \
