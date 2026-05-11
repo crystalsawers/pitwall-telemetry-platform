@@ -4,6 +4,8 @@
 if [ "$EUID" -ne 0 ]; then
   echo "Run with sudo: sudo $0"
   echo "Use 'sudo -i' to get a root shell and then run the script. You will get 'root@pitwall-vm:~# '"
+  echo "If you're uploading the script, move it to the root user's home directory: mv ~/basic_setup.sh /root/."
+  echo "Use chmod +x basic_setup.sh to make it executable, then run it with sudo: ./basic_setup.sh"
   exit 1
 fi
 

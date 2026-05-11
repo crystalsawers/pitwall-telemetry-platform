@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# For the VM you NEED to run as root, otherwise this wont work
+if [ "$EUID" -ne 0 ]; then
+  echo "Run with sudo: sudo $0"
+  echo "Use 'sudo -i' to get a root shell and then run the script. You will get 'root@pitwall-vm:~# '"
+  echo "If you're uploading the script, move it to the root user's home directory: mv ~/create_containers.sh /root/."
+  echo "Use chmod +x create_containers.sh to make it executable, then run it: ./create_containers.sh"
+  exit 1
+fi 
+
 # Create the f1-telemetry directory for files to be put in
 mkdir -p f1-telemetry/app
 cd f1-telemetry
@@ -168,8 +177,8 @@ EOF
 docker compose up -d --build
 
 echo "Containers created and running. Access the FastAPI app at curl http://localhost:8000"
-echo "To stop the containers, run: docker compose down"
-echo "To view logs, run: docker compose logs -f"
-echo "To access the database, run: docker exec -it postgres_db psql -U postgres -d f1_telemetry"
+echo "To stop the containers, run: cd f1-telemetry && docker compose down"
+echo "To view logs, run: cd f1-telemetry && docker compose logs -f"
+echo "To access the database, run: cd f1-telemetry && docker exec -it postgres_db psql -U postgres -d f1_telemetry"
 echo "Let's have a look at the running containers:"
 docker ps
