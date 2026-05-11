@@ -1,8 +1,8 @@
 # Pitwall Telemetry Platform
 
-A cloud-native telemetry and data platform inspired by Formula 1 systems, built on Google Cloud using modern DevOps, infrastructure-as-code, and microservices architecture principles.
+The **Pitwall Telemetry Platform** is a cloud-native telemetry and data platform inspired by **Formula 1 systems**, built on **Google Cloud** using modern DevOps, infrastructure-as-code, and microservices architecture principles.
 
-_Project timeframe: May 2026 – Present_
+_Project timeframe: 9 May 2026 - Present_
 
 ---
 
@@ -93,56 +93,105 @@ To manage this:
 
 ## Development Phases
 
-The project is structured into incremental phases:
-
-### Phase 1 – Foundation Setup
-- GitHub repository initialization
-- Google Cloud environment setup
-- Compute Engine instance provisioning
-- Ubuntu Server configuration
-- Docker installation
-- SSH access setup
+This project is split into a structured 3-part progression, documented as a blog series covering infrastructure setup, automation, scaling, and production-grade DevOps practices.
 
 ---
 
-### Phase 2 – Initial Application Deployment
-- FastAPI microservice development
-- Docker containerisation
-- PostgreSQL integration
-- Deployment to Compute Engine
-- Basic API endpoints for telemetry-style data
+### Part 1 - Core System & Initial Automation (Phase 1-2)
+
+📘 Docs: `/docs/phase 1-2.md`  
+📝 Blog: (coming soon)
+
+#### Phase 1 - Core System Build
+
+* Google Cloud Console (Compute Engine)
+* VPC networking and firewall configuration
+* Ubuntu Server setup
+* SSH access configuration
+* Docker + Docker Compose
+* FastAPI microservice
+* PostgreSQL database
+* Initial containerised application deployment
+
+**Outcome:** A fully working VM running a containerised API + database stack.
 
 ---
 
-### Phase 3+ (Planned)
-- Kubernetes migration (GKE)
-- Service orchestration
-- Observability stack deployment
-- CI/CD automation
-- Security hardening
-- Full system integration
+#### Phase 2 - Infrastructure Automation
+
+* Google Cloud Console + Cloud Shell
+* `gcloud` CLI automation
+* Startup scripts for instance bootstrapping
+* Instance templates for repeatable deployment
+* Docker + Docker Compose automation
+* Integration of real Formula 1 telemetry/data sources (initial ingestion experiments)
+
+**Outcome:** Repeatable infrastructure setup with scripted deployment instead of manual configuration. But you have to actually understand the manual configuration first. 
+
+---
+
+### Part 2 - Scaling, Observability & Security (Phase 3-5)
+
+📘 Docs: (coming soon)  
+📝 Blog: (coming soon)
+
+**Focus:** Moving from a single VM system to a managed, scalable cloud-native architecture.
+
+#### Phase 3 - Kubernetes Orchestration
+
+* Google Kubernetes Engine (GKE)
+* Container orchestration and service deployment
+* Scaling microservices architecture
+
+#### Phase 4 - Observability Stack
+
+* Google Cloud Operations Suite
+
+  * Cloud Monitoring
+  * Cloud Logging
+* System metrics, logs, and dashboards
+* Service health visibility
+
+#### Phase 5 - Security & Access Control
+
+* IAM roles and permissions
+* VPC firewall policy refinement
+* Secret Manager for credential handling
+
+**Outcome:** A scalable, observable, and security-hardened cloud-native system.
+
+---
+
+### Part 3 - Production Automation & IaC (Phase 6-7)
+
+📘 Docs: (coming soon)  
+📝 Blog: (coming soon)
+
+**Focus:** Full production-style automation and infrastructure management.
+
+#### Phase 6 - CI/CD Pipelines
+
+* Google Cloud Build
+* Automated testing and deployment pipelines
+* Continuous delivery of containerised services
+
+#### Phase 7 - Infrastructure as Code
+
+* Artifact Registry (container management)
+* Terraform for infrastructure provisioning (optional but recommended)
+* Fully reproducible cloud environments
+
+**Outcome:** End-to-end automated deployment pipeline with infrastructure defined as code.
 
 ---
 
 ## Current Status
 
-**Phase 1 & 2:** Initial working system (single-node deployment with containerised API + database)
+**Phase 1 & 2:** Initial working system (single-node deployment with containerised API + database), Done
 
-This stage validates the end-to-end flow:
-Application → Container → Cloud Deployment → Database
+**Phase 1** is the experiment of using Compute Engine inside the Console, while **Phase 2** involves using a script to set everything up.
 
-Phase 1 is the experiment of using Compute Engine inside the Console, while Phase 2 involves using a script to set everything up.
-
----
-
-## Evidence & Documentation
-
-The project will eventually be fully documented through:
-- Screen recordings of setup and deployment
-- Infrastructure configuration snapshots
-- GitHub commit history tracking progression
-- API response validation from deployed services
-- Database interaction logs
+**Next:** Phase 3 - Kubernetes Orchestration
 
 ---
 
