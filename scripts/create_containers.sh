@@ -48,6 +48,7 @@ cat <<EOF > requirements.txt
 fastapi
 uvicorn[standard]
 psycopg[binary]
+requests
 EOF
 
 # app/main.py
@@ -55,6 +56,7 @@ cat <<EOF > app/main.py
 import os
 from fastapi import FastAPI
 import psycopg
+import requests
 
 app = FastAPI()
 
@@ -97,18 +99,33 @@ def init_table():
 
 @app.post("/telemetry/add")
 def add_telemetry():
+    response = requests.get(
+        "https://api.openf1.org/v1/laps?session_key=latest"
+    )
+
+    data = response.json()
+
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
 
-    cur.execute("""
-        INSERT INTO telemetry (driver, lap_time)
-        VALUES ('VER', 72.5);
-    """)
+    inserted = 0
+
+    for lap in data[:10]:
+        driver = str(lap.get("driver_number", "UNK"))
+        lap_time = lap.get("lap_duration")
+
+        if lap_time is not None:
+            cur.execute("""
+                INSERT INTO telemetry (driver, lap_time)
+                VALUES (%s, %s);
+            """, (driver, lap_time))
+
+            inserted += 1
 
     conn.commit()
     conn.close()
 
-    return {"status": "data inserted"}
+    return {"status": f"{inserted} rows inserted"}
 
 
 @app.get("/telemetry")
@@ -177,6 +194,7 @@ EOF
 docker compose up -d --build
 
 echo "Containers created and running. Access the FastAPI app at curl http://localhost:8000"
+echo "Also test the following: curl -X POST http://localhost:8000/telemetry/init ,  curl -X POST http://localhost:8000/telemetry/add , curl http://localhost:8000/telemetry"
 echo "To stop the containers, run: cd f1-telemetry && docker compose down"
 echo "To view logs, run: cd f1-telemetry && docker compose logs -f"
 echo "To access the database, run: cd f1-telemetry && docker exec -it postgres_db psql -U postgres -d f1_telemetry"
