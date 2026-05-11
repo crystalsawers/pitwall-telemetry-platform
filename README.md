@@ -99,7 +99,7 @@ This project is split into a structured 3-part progression, documented as a blog
 
 ### Part 1 - Core System & Initial Automation (Phase 1-2)
 
-📘 Docs: `/docs/phase 1-2.md`  
+📘 Docs: [/docs/phase 1-2.md](../docs/phase 1-2.md)
 📝 Blog: (coming soon)
 
 #### Phase 1 - Core System Build
