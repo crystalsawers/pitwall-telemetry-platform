@@ -63,6 +63,9 @@ app = FastAPI()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
+# -------------------------
+# DB SETUP
+# -------------------------
 def create_table():
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
@@ -86,60 +89,102 @@ def create_table():
 create_table()
 
 
+# -------------------------
+# GET LATEST RACE SESSION
+# -------------------------
+def get_latest_race_session():
+
+    response = requests.get(
+        "https://api.openf1.org/v1/sessions"
+    )
+
+    sessions = response.json()
+
+    race_sessions = [
+        s for s in sessions
+        if s.get("session_type") == "Race"
+    ]
+
+    if not race_sessions:
+        return None
+
+    # latest race session
+    latest = max(
+        race_sessions,
+        key=lambda x: x.get("date_start", "")
+    )
+
+    return latest.get("session_key")
+
+
+# -------------------------
+# ROOT
+# -------------------------
 @app.get("/")
 def root():
     return {"status": "F1 telemetry API running"}
 
 
-@app.get("/db-test")
-def db_test():
-    conn = psycopg.connect(DATABASE_URL)
-    cur = conn.cursor()
+# -------------------------
+# TELEMETRY INGESTION
+# -------------------------
+def ingest_data():
 
-    cur.execute("SELECT version();")
-    result = cur.fetchone()
-
-    conn.close()
-
-    return {"postgres": result}
-
-
-@app.post("/telemetry/add")
-def add_telemetry():
-
-    response = requests.get(
+    laps = requests.get(
         "https://api.openf1.org/v1/laps?session_key=latest"
-    )
+    ).json()
 
-    data = response.json()
+    positions = requests.get(
+        "https://api.openf1.org/v1/position?session_key=latest"
+    ).json()
+
+    drivers = requests.get(
+        "https://api.openf1.org/v1/drivers?session_key=latest"
+    ).json()
+
+    position_map = {
+        p["driver_number"]: p.get("position")
+        for p in positions
+        if p.get("driver_number")
+    }
+
+    driver_map = {
+        d["driver_number"]: {
+            "name": d.get("full_name", "Unknown"),
+            "team": d.get("team_name", "Unknown")
+        }
+        for d in drivers
+        if d.get("driver_number")
+    }
 
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
 
     inserted = 0
 
-    for lap in data[:10]:
+    for lap in laps[:15]:
 
         driver_number = lap.get("driver_number")
         lap_time = lap.get("lap_duration")
         lap_number = lap.get("lap_number")
-        position = lap.get("position")
 
-        if lap_time is None or driver_number is None:
+        if not driver_number or not lap_time:
             continue
 
-        driver_response = requests.get(
-            f"https://api.openf1.org/v1/drivers?session_key=latest&driver_number={driver_number}"
-        )
+        driver_info = driver_map.get(driver_number, {})
+        driver_name = driver_info.get("name", "Unknown")
+        team_name = driver_info.get("team", "Unknown")
 
-        driver_data = driver_response.json()
+        position = position_map.get(driver_number)
 
-        if driver_data:
-            driver_name = driver_data[0].get("full_name", "Unknown")
-            team_name = driver_data[0].get("team_name", "Unknown")
-        else:
-            driver_name = "Unknown"
-            team_name = "Unknown"
+        # prevent duplicates
+        cur.execute("""
+            SELECT 1 FROM telemetry
+            WHERE driver_number = %s AND lap_number = %s
+        """, (driver_number, lap_number))
+
+        if cur.fetchone():
+            continue
 
         cur.execute("""
             INSERT INTO telemetry (
@@ -150,7 +195,7 @@ def add_telemetry():
                 lap_time,
                 position
             )
-            VALUES (%s, %s, %s, %s, %s, %s);
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
             driver_number,
             driver_name,
@@ -165,25 +210,23 @@ def add_telemetry():
     conn.commit()
     conn.close()
 
-    return {"status": f"{inserted} rows inserted"}
+    return inserted
 
 
+# -------------------------
+# TELEMETRY (LIVE-ISH)
+# -------------------------
 @app.get("/telemetry")
 def get_telemetry():
 
-    add_telemetry()
+    ingest_data()
 
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            driver_number,
-            driver_name,
-            team_name,
-            lap_number,
-            lap_time,
-            position
+        SELECT driver_number, driver_name, team_name,
+               lap_number, lap_time, position
         FROM telemetry
         ORDER BY id DESC
     """)
@@ -194,10 +237,8 @@ def get_telemetry():
     leaderboard = {}
 
     for r in rows:
-        driver_number = r[0]
-
-        if driver_number not in leaderboard:
-            leaderboard[driver_number] = {
+        if r[0] not in leaderboard:
+            leaderboard[r[0]] = {
                 "driver_number": r[0],
                 "driver_name": r[1],
                 "team_name": r[2],
@@ -217,6 +258,64 @@ def get_telemetry():
 
     return {
         "mode": "live_leaderboard",
+        "data": data
+    }
+
+
+# -------------------------
+# DRIVERS CHAMPIONSHIP (AUTO SESSION)
+# -------------------------
+@app.get("/championship/drivers")
+def drivers_championship():
+
+    session_key = get_latest_race_session()
+
+    if not session_key:
+        return {"error": "No race session found"}
+
+    response = requests.get(
+        f"https://api.openf1.org/v1/championship_drivers?session_key={session_key}"
+    )
+
+    data = response.json()
+
+    data.sort(
+        key=lambda x: x.get("points_current", 0),
+        reverse=True
+    )
+
+    return {
+        "session_key": session_key,
+        "mode": "drivers_championship",
+        "data": data
+    }
+
+
+# -------------------------
+# CONSTRUCTORS CHAMPIONSHIP (AUTO SESSION)
+# -------------------------
+@app.get("/championship/constructors")
+def constructors_championship():
+
+    session_key = get_latest_race_session()
+
+    if not session_key:
+        return {"error": "No race session found"}
+
+    response = requests.get(
+        f"https://api.openf1.org/v1/championship_teams?session_key={session_key}"
+    )
+
+    data = response.json()
+
+    data.sort(
+        key=lambda x: x.get("points_current", 0),
+        reverse=True
+    )
+
+    return {
+        "session_key": session_key,
+        "mode": "constructors_championship",
         "data": data
     }
 EOF
