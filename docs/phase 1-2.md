@@ -1,3 +1,5 @@
+![The Art of Google Cloud Part 1](https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fart-of-google-cloud-1.png?alt=media&token=64638b04-7c64-4e6f-b463-25a73bfa0bd7)
+
 # The Art of Google Cloud (Part 1): The Three-Month Free Trial
 
 _Project Timeframe: 9 May 2026 - present_
