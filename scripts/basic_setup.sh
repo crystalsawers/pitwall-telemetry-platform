@@ -52,5 +52,4 @@ if [ $? -ne 0 ]; then
     systemctl enable docker
 fi
 
-echo "Basic setup completed. Please log out and log back in to apply Docker group changes."
-echo "You can verify Docker installation by running 'docker run hello-world' after logging back in, and then 'docker ps' to check."
+echo "Basic setup completed. You can verify Docker installation by running 'docker run hello-world' or 'docker --version', and then 'docker ps' to check."

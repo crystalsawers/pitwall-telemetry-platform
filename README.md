@@ -131,6 +131,8 @@ The project is structured into incremental phases:
 This stage validates the end-to-end flow:
 Application → Container → Cloud Deployment → Database
 
+Phase 1 is the experiment of using Compute Engine inside the Console, while Phase 2 involves using a script to set everything up.
+
 ---
 
 ## Evidence & Documentation
