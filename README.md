@@ -99,8 +99,8 @@ This project is split into a structured 3-part progression, documented as a blog
 
 ### Part 1 - Core System & Initial Automation (Phase 1-2)
 
-📘 Docs: [/docs/phase 1-2.md](../docs/phase 1-2.md)
-📝 Blog: (coming soon)
+📘 Docs: [/docs/phase 1-2.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%201-2.md)
+📝 Blog: [The Art of Google Cloud (Part 1)](https://loglapandover.co.nz/projects/devops/P9McSw1XKxtBUFpzdg4g)
 
 #### Phase 1 - Core System Build
 
