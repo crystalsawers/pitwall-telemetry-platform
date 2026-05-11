@@ -38,7 +38,7 @@ Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
 # Install Docker Engine
-apt update
+apt update # Important! As it will not install at all if you don't do this first
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Verify Docker is running
@@ -50,7 +50,5 @@ if [ $? -ne 0 ]; then
     systemctl enable docker
 fi
 
-# Add current user to the docker group to run Docker without sudo
-usermod -aG docker $USER
 echo "Basic setup completed. Please log out and log back in to apply Docker group changes."
 echo "You can verify Docker installation by running 'docker run hello-world' after logging back in, and then 'docker ps' to check."

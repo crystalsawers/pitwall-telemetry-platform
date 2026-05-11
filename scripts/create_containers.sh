@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create the f1-telemetry directory for files to be put in
-mkdir -p f1-telemetry
+mkdir -p f1-telemetry/app
 cd f1-telemetry
 
 # Create the files
@@ -10,14 +10,16 @@ touch  .env Dockerfile docker-compose.yml requirements.txt app/main.py
 # Populate the files
 
 # .env
-cat <<EOL > POSTGRES_USER=postgres
+cat <<EOF > .env
+POSTGRES_USER=postgres
 POSTGRES_PASSWORD=changepasswordhere
 POSTGRES_DB=f1_telemetry
 DATABASE_URL=postgresql://postgres:changepasswordhere@db:5432/f1_telemetry
-EOL
+EOF
 
 # Dockerfile
-cat <<EOL > FROM python:3.14-slim
+cat <<EOF > Dockerfile
+FROM python:3.14-slim
 
 WORKDIR /app
 
@@ -30,16 +32,17 @@ COPY . .
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-EOL
+EOF
 
 # requirements.txt
-cat <<EOL > fastapi
+cat <<EOF > requirements.txt
+fastapi
 uvicorn[standard]
 psycopg[binary]
-EOL
+EOF
 
-# docker-compose.yml
-cat <<EOL > services:
+cat <<EOF > docker-compose.yml
+services:
   web:
     build: .
     image: f1-telemetry-api:1.0
@@ -85,8 +88,7 @@ cat <<EOL > services:
 
 volumes:
   pgdata:
-
-EOL
+EOF
 
 # Run the containers
 docker-compose up -d --build
