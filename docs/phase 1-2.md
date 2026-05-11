@@ -86,13 +86,7 @@ To begin the project, I am **not** starting with the full architecture immediate
 
 ### Phase 1 - Creating the Virtual Machine and Containers
 
-<video controls>
-  <source src="
-  " type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1-GCloud-Project-1.mp4?alt=media&token=b33ddf06-95cc-4697-9a61-8727d7307259 
+[![Phase 1 Demo](../docs/images/f1-demo-1.png)](https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1-GCloud-Project-1.mp4?alt=media&token=b33ddf06-95cc-4697-9a61-8727d7307259)
 
 <br>
 
@@ -106,10 +100,7 @@ This initial demo consists of a single **FastAPI service** running inside a Dock
 
 ### Phase 2 - Scripting and Automating the VM Process
 
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1-GCloud-Project-2.mp4?alt=media&token=03d5d441-cda4-4c24-8aa9-9d97cc78ae9c " type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[![Phase 2 Demo](../docs/images/f1-demo-2.png)](https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1-GCloud-Project-2.mp4?alt=media&token=03d5d441-cda4-4c24-8aa9-9d97cc78ae9c)
 
 <br>
 
@@ -126,9 +117,8 @@ All of the scripts in this repository have all been run and verified locally, so
 ---
 ## The Formula 1 part of the project
 
-<div style="text-align: center;">
-    <img src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2F1778485005222-f1-data.png?alt=media&token=9ffcaa29-ee0e-4fe7-add7-2c6bf6e8fb34" alt="image" width="1000" style="display: inline-block;"/> 
-</div>
+
+![F1 data](https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2F1778485005222-f1-data.png?alt=media&token=9ffcaa29-ee0e-4fe7-add7-2c6bf6e8fb34)
 
 <br>
 
