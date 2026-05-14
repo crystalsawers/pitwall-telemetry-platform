@@ -4,10 +4,10 @@
 if [ "$EUID" -ne 0 ]; then
   echo "Run with sudo: sudo $0"
   echo "Use 'sudo -i' to get a root shell and then run the script. You will get 'root@pitwall-vm:~# '"
-  echo "If you're uploading the script, move it to the root user's home directory: mv ~/create_containers.sh /root/."
+  echo "If you're uploading the script, move it to the root user's home directory: sudo mv ~/create_containers.sh /root/."
   echo "Use chmod +x create_containers.sh to make it executable, then run it: ./create_containers.sh"
   exit 1
-fi 
+fi
 
 # Create the f1-telemetry directory for files to be put in
 mkdir -p f1-telemetry/app
@@ -21,9 +21,9 @@ touch  .env Dockerfile docker-compose.yml requirements.txt app/main.py
 # .env
 cat <<EOF > .env
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=changepasswordhere
+POSTGRES_PASSWORD=postgres69
 POSTGRES_DB=f1_telemetry
-DATABASE_URL=postgresql://postgres:changepasswordhere@db:5432/f1_telemetry
+DATABASE_URL=postgresql://postgres:postgres69@db:5432/f1_telemetry
 EOF
 
 # Dockerfile
@@ -49,23 +49,55 @@ fastapi
 uvicorn[standard]
 psycopg[binary]
 requests
+prometheus_client
 EOF
 
 # app/main.py
 cat <<EOF > app/main.py
 import os
-from fastapi import FastAPI
+import logging
 import psycopg
 import requests
+
+from fastapi import FastAPI, Response
+from prometheus_client import Counter, generate_latest
 
 app = FastAPI()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
-# -------------------------
+# LOGGING (for Loki via Docker logs + Promtail)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
+
+logger = logging.getLogger("f1-telemetry")
+
+
+
+# PROMETHEUS METRICS
+
+REQUEST_COUNT = Counter("requests_total", "Total API requests")
+
+
+@app.middleware("http")
+async def count_requests(request, call_next):
+    REQUEST_COUNT.inc()
+    response = await call_next(request)
+    return response
+
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type="text/plain")
+
+
+
 # DB SETUP
-# -------------------------
+
 def create_table():
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
@@ -85,19 +117,17 @@ def create_table():
     conn.commit()
     conn.close()
 
+    logger.info("Database table ensured")
+
 
 create_table()
 
 
-# -------------------------
+
 # GET LATEST RACE SESSION
-# -------------------------
+
 def get_latest_race_session():
-
-    response = requests.get(
-        "https://api.openf1.org/v1/sessions"
-    )
-
+    response = requests.get("https://api.openf1.org/v1/sessions")
     sessions = response.json()
 
     race_sessions = [
@@ -106,41 +136,33 @@ def get_latest_race_session():
     ]
 
     if not race_sessions:
+        logger.warning("No race sessions found")
         return None
 
-    # latest race session
-    latest = max(
-        race_sessions,
-        key=lambda x: x.get("date_start", "")
-    )
+    latest = max(race_sessions, key=lambda x: x.get("date_start", ""))
 
+    logger.info(f"Latest session key found: {latest.get('session_key')}")
     return latest.get("session_key")
 
 
-# -------------------------
+
 # ROOT
-# -------------------------
+
 @app.get("/")
 def root():
+    logger.info("Root endpoint hit")
     return {"status": "F1 telemetry API running"}
 
 
-# -------------------------
+
 # TELEMETRY INGESTION
-# -------------------------
+
 def ingest_data():
+    logger.info("Starting ingestion")
 
-    laps = requests.get(
-        "https://api.openf1.org/v1/laps?session_key=latest"
-    ).json()
-
-    positions = requests.get(
-        "https://api.openf1.org/v1/position?session_key=latest"
-    ).json()
-
-    drivers = requests.get(
-        "https://api.openf1.org/v1/drivers?session_key=latest"
-    ).json()
+    laps = requests.get("https://api.openf1.org/v1/laps?session_key=latest").json()
+    positions = requests.get("https://api.openf1.org/v1/position?session_key=latest").json()
+    drivers = requests.get("https://api.openf1.org/v1/drivers?session_key=latest").json()
 
     position_map = {
         p["driver_number"]: p.get("position")
@@ -177,7 +199,6 @@ def ingest_data():
 
         position = position_map.get(driver_number)
 
-        # prevent duplicates
         cur.execute("""
             SELECT 1 FROM telemetry
             WHERE driver_number = %s AND lap_number = %s
@@ -210,14 +231,17 @@ def ingest_data():
     conn.commit()
     conn.close()
 
+    logger.info(f"Ingestion complete. Inserted {inserted} rows")
+
     return inserted
 
 
-# -------------------------
-# TELEMETRY (LIVE-ISH)
-# -------------------------
+
+# TELEMETRY
+
 @app.get("/telemetry")
 def get_telemetry():
+    logger.info("Telemetry endpoint called")
 
     ingest_data()
 
@@ -256,15 +280,17 @@ def get_telemetry():
         )
     )
 
+    logger.info(f"Returned {len(data)} leaderboard entries")
+
     return {
         "mode": "live_leaderboard",
         "data": data
     }
 
 
-# -------------------------
-# DRIVERS CHAMPIONSHIP (AUTO SESSION)
-# -------------------------
+
+# DRIVERS CHAMPIONSHIP
+
 @app.get("/championship/drivers")
 def drivers_championship():
 
@@ -279,10 +305,9 @@ def drivers_championship():
 
     data = response.json()
 
-    data.sort(
-        key=lambda x: x.get("points_current", 0),
-        reverse=True
-    )
+    data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
+
+    logger.info("Drivers championship fetched")
 
     return {
         "session_key": session_key,
@@ -291,9 +316,9 @@ def drivers_championship():
     }
 
 
-# -------------------------
-# CONSTRUCTORS CHAMPIONSHIP (AUTO SESSION)
-# -------------------------
+
+# CONSTRUCTORS CHAMPIONSHIP
+
 @app.get("/championship/constructors")
 def constructors_championship():
 
@@ -308,10 +333,9 @@ def constructors_championship():
 
     data = response.json()
 
-    data.sort(
-        key=lambda x: x.get("points_current", 0),
-        reverse=True
-    )
+    data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
+
+    logger.info("Constructors championship fetched")
 
     return {
         "session_key": session_key,
@@ -345,6 +369,10 @@ services:
 
     restart: always
 
+    networks:
+      - telemetry-network
+
+
   db:
     image: postgres:18
     container_name: postgres_db
@@ -366,8 +394,17 @@ services:
       timeout: 5s
       retries: 5
 
+    networks:
+      - telemetry-network
+
+
 volumes:
   pgdata:
+
+
+networks:
+  telemetry-network:
+    external: true
 EOF
 
 # Run the containers
@@ -376,16 +413,11 @@ docker compose up -d --build
 echo "Containers created and running."
 echo "Access the FastAPI app with: curl http://localhost:8000"
 echo ""
-echo "Initialise the telemetry table:"
-echo "curl -X POST http://localhost:8000/telemetry/init"
-echo ""
 echo "View live telemetry-style F1 data:"
 echo "curl http://localhost:8000/telemetry"
 echo ""
+echo "The telemetry table is now created automatically on container startup."
 echo "The /telemetry endpoint automatically fetches and stores fresh OpenF1 data before returning results."
-echo ""
-echo "Optional manual data fetch endpoint:"
-echo "curl -X POST http://localhost:8000/telemetry/add"
 echo ""
 echo "To stop the containers:"
 echo "cd f1-telemetry && docker compose down"

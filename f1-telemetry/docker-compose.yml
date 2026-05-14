@@ -21,6 +21,10 @@ services:
 
     restart: always
 
+    networks:
+      - telemetry-network
+
+
   db:
     image: postgres:18
     container_name: postgres_db
@@ -42,5 +46,14 @@ services:
       timeout: 5s
       retries: 5
 
+    networks:
+      - telemetry-network
+
+
 volumes:
   pgdata:
+
+
+networks:
+  telemetry-network:
+    external: true
