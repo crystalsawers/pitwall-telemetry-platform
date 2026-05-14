@@ -55,16 +55,17 @@ This project will be broken down into several phases, documented as a 3-part blo
   * **Phase 1 (Core system build):** Google Cloud Console (Compute Engine, VPC networking, firewall rules), Ubuntu Server, SSH, Docker, Docker Compose, FastAPI, PostgreSQL
   * **Phase 2 (Infrastructure automation):** Google Cloud Console + Cloud Shell, `gcloud` CLI, startup scripts, instance templates, Docker, Docker Compose, also getting some real F1 data to use.
 
-* **Part 2** covers **Phase 3, Phase 4, and Phase 5**, focusing on scaling, orchestration, observability, and security using managed Google Cloud services.
+* **Part 2** covers **Phase 3, Phase 4, and Phase 5**, focusing on managed services, observability, and security in Google Cloud.
 
-  * **Phase 3:** Google Kubernetes Engine (GKE)
-  * **Phase 4:** Cloud Monitoring + Cloud Logging (Operations Suite)
-  * **Phase 5:** IAM, VPC firewall policies, Secret Manager
+  * **Phase 3 (Observability & monitoring):** Prometheus, Grafana, Loki, uptime checks, dashboards, alerting
+  * **Phase 4 (Security & access control):** IAM, VPC firewall policies, Secret Manager, service accounts
+  * **Phase 5 (Managed application services):** Cloud Run, Cloud SQL, container deployment, managed database connectivity
 
-* **Part 3** covers **Phase 6 and Phase 7**, focusing on production automation and system integration.
+* **Part 3** covers **Phase 6, Phase 7, and Phase 8**, focusing on orchestration, automation, and production infrastructure.
 
-  * **Phase 6:** Cloud Build (CI/CD pipelines)
-  * **Phase 7:** Artifact Registry (container management), Terraform (Infrastructure as Code, optional but strong DevOps signal)
+  * **Phase 6 (CI/CD automation):** Cloud Build, GitHub integration, automated container builds and deployments
+  * **Phase 7 (Container orchestration):** Artifact Registry, Google Kubernetes Engine (GKE), Kubernetes deployments and scaling
+  * **Phase 8 (Infrastructure as Code):** Terraform, reusable infrastructure provisioning, automated environment setup
 
 
 ---
