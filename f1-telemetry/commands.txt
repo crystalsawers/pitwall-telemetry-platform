@@ -69,7 +69,7 @@ docker compose up --build -d
 docker compose restart
 
 # =========================
-# DATABASE DEBUG (optional)
+# DATABASE DEBUG 
 # =========================
 
 # Enter Postgres container
@@ -80,3 +80,7 @@ docker exec -it postgres_db psql -U postgres -d f1_telemetry
 
 # View telemetry table
 SELECT * FROM telemetry;
+
+# =========================
+# MONITORING 
+# =========================
