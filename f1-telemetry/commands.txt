@@ -84,3 +84,7 @@ SELECT * FROM telemetry;
 # =========================
 # MONITORING 
 # =========================
+
+docker compose down && docker compose -f ~/f1-telemetry/monitoring/docker-compose.monitoring.yml down
+
+docker compose up -d && docker compose -f ~/f1-telemetry/monitoring/docker-compose.monitoring.yml up -d
