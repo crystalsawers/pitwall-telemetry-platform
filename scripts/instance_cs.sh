@@ -3,6 +3,22 @@
 # Google Cloud Shell Script
 
 # Create Google Cloud Compute Engine instance for Pitwall Telemetry Platform
+# Open Firewall Ports for Monitoring Stack
+
+set -e
+
+FIREWALL_RULE="allow-monitoring"
+
+if gcloud compute firewall-rules describe "$FIREWALL_RULE" >/dev/null 2>&1; then
+    echo "Firewall rule '$FIREWALL_RULE' already exists, skipping..."
+else
+    echo "Creating firewall rule '$FIREWALL_RULE'..."
+
+    gcloud compute firewall-rules create "$FIREWALL_RULE" \
+      --allow tcp:3000,tcp:9090,tcp:3100 \
+      --direction=INGRESS
+fi
+
 
 # Set variables (replace placeholders before running)
 PROJECT_ID="your-project-id"
