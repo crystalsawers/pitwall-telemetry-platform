@@ -21,9 +21,9 @@ touch  .env Dockerfile docker-compose.yml requirements.txt app/main.py
 # .env
 cat <<EOF > .env
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres69
+POSTGRES_PASSWORD=change_this_password
 POSTGRES_DB=f1_telemetry
-DATABASE_URL=postgresql://postgres:postgres69@db:5432/f1_telemetry
+DATABASE_URL=postgresql://postgres:change_this_password@db:5432/f1_telemetry
 EOF
 
 # Dockerfile
