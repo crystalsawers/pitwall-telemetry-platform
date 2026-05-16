@@ -15,7 +15,7 @@ else
     echo "Creating firewall rule '$FIREWALL_RULE'..."
 
     gcloud compute firewall-rules create "$FIREWALL_RULE" \
-      --allow tcp:3000,tcp:9090,tcp:3100 \
+      --allow tcp:3000,tcp:9090,tcp:3100,tcp:8000 \
       --direction=INGRESS
 fi
 

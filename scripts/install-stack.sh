@@ -55,7 +55,7 @@ apt update # Important! As it will not install at all if you don't do this first
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Verify Docker is running
-systemctl status docker
+systemctl status docker --no-pager
 
 if [ $? -ne 0 ]; then
     echo "Docker is not running. Starting Docker."
