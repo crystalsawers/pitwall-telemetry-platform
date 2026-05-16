@@ -286,3 +286,21 @@ def constructors_championship():
         "mode": "constructors_championship",
         "data": data
     }
+
+# CUSTOM METRIC FOR GRAFANA DASHBOARD
+
+@app.get("/metrics/telemetry")
+def telemetry_metric():
+    logger.info("Telemetry metric requested")
+
+    conn = psycopg.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(DISTINCT driver_number) FROM telemetry;")
+    result = cur.fetchone()[0]
+
+    conn.close()
+
+    return {
+        "active_drivers": result
+    }
