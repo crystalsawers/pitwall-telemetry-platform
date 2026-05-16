@@ -119,17 +119,17 @@ import os
 import logging
 import psycopg
 import requests
+import threading
+import time
 
 from fastapi import FastAPI, Response
-from prometheus_client import Counter, generate_latest
+from prometheus_client import Counter, Gauge, generate_latest
 
 app = FastAPI()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-
-# LOGGING (for Loki via Docker logs + Promtail)
-
+# LOGGING
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s"
@@ -137,11 +137,12 @@ logging.basicConfig(
 
 logger = logging.getLogger("f1-telemetry")
 
-
-
 # PROMETHEUS METRICS
-
 REQUEST_COUNT = Counter("requests_total", "Total API requests")
+
+FASTEST_LAP = Gauge("fastest_lap_time", "Fastest lap time")
+ACTIVE_DRIVERS = Gauge("active_drivers", "Number of active drivers")
+AVG_LAP_TIME = Gauge("avg_lap_time", "Average lap time")
 
 
 @app.middleware("http")
@@ -156,10 +157,8 @@ def metrics():
     return Response(generate_latest(), media_type="text/plain")
 
 
-
-# DB SETUP
-
-def create_table():
+# DB INIT
+def init_db():
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
 
@@ -178,15 +177,31 @@ def create_table():
     conn.commit()
     conn.close()
 
-    logger.info("Database table ensured")
+    logger.info("Database ready")
 
 
-create_table()
+init_db()
 
+
+# BACKGROUND INGESTION LOOP
+def ingestion_loop():
+    while True:
+        try:
+            logger.info("Auto ingestion running...")
+            ingest_data()
+        except Exception as e:
+            logger.error(f"Ingestion error: {e}")
+
+        time.sleep(30)
+
+
+@app.on_event("startup")
+def start_background_tasks():
+    thread = threading.Thread(target=ingestion_loop, daemon=True)
+    thread.start()
 
 
 # GET LATEST RACE SESSION
-
 def get_latest_race_session():
     response = requests.get("https://api.openf1.org/v1/sessions")
     sessions = response.json()
@@ -206,18 +221,14 @@ def get_latest_race_session():
     return latest.get("session_key")
 
 
-
 # ROOT
-
 @app.get("/")
 def root():
     logger.info("Root endpoint hit")
     return {"status": "F1 telemetry API running"}
 
 
-
 # TELEMETRY INGESTION
-
 def ingest_data():
     logger.info("Starting ingestion")
 
@@ -292,14 +303,27 @@ def ingest_data():
     conn.commit()
     conn.close()
 
+    # PROMETHEUS UPDATE
+    conn2 = psycopg.connect(DATABASE_URL)
+    cur2 = conn2.cursor()
+
+    cur2.execute("SELECT MIN(lap_time) FROM telemetry")
+    FASTEST_LAP.set(cur2.fetchone()[0] or 0)
+
+    cur2.execute("SELECT COUNT(DISTINCT driver_number) FROM telemetry")
+    ACTIVE_DRIVERS.set(cur2.fetchone()[0] or 0)
+
+    cur2.execute("SELECT AVG(lap_time) FROM telemetry")
+    AVG_LAP_TIME.set(cur2.fetchone()[0] or 0)
+
+    conn2.close()
+
     logger.info(f"Ingestion complete. Inserted {inserted} rows")
 
     return inserted
 
 
-
 # TELEMETRY
-
 @app.get("/telemetry")
 def get_telemetry():
     logger.info("Telemetry endpoint called")
@@ -349,9 +373,7 @@ def get_telemetry():
     }
 
 
-
-# DRIVERS CHAMPIONSHIP
-
+# CHAMPIONSHIPS
 @app.get("/championship/drivers")
 def drivers_championship():
 
@@ -365,7 +387,6 @@ def drivers_championship():
     )
 
     data = response.json()
-
     data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
 
     logger.info("Drivers championship fetched")
@@ -376,9 +397,6 @@ def drivers_championship():
         "data": data
     }
 
-
-
-# CONSTRUCTORS CHAMPIONSHIP
 
 @app.get("/championship/constructors")
 def constructors_championship():
@@ -393,7 +411,6 @@ def constructors_championship():
     )
 
     data = response.json()
-
     data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
 
     logger.info("Constructors championship fetched")
@@ -402,6 +419,23 @@ def constructors_championship():
         "session_key": session_key,
         "mode": "constructors_championship",
         "data": data
+    }
+
+
+# METRICS ENDPOINT
+@app.get("/metrics/telemetry")
+def telemetry_metric():
+
+    conn = psycopg.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(DISTINCT driver_number) FROM telemetry;")
+    result = cur.fetchone()[0]
+
+    conn.close()
+
+    return {
+        "active_drivers": result
     }
 EOF
 
