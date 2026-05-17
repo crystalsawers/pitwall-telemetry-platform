@@ -20,6 +20,9 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
 
+    environment:
+    - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+
     ports:
       - "3000:3000"
 
