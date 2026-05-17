@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This is the combined script that includes both the basic setup and the stack installation. 
-# NOTE: Make sure you fill in your own placeholder password in the .env file before running the script.
+# This is the combined script that includes the basic setup, the data containers, and the monitoring stack.
+# NOTE: If you're using this script, make sure you fill in your own placeholder password in the .env file before running the script.
 
 # For the VM you NEED to run as root, otherwise this wont work
 if [ "$EUID" -ne 0 ]; then
@@ -19,7 +19,7 @@ fi
 # Update and upgrade the system, then install necessary base packages
 
 apt update &&  apt upgrade -y
-apt install -y git curl ufw ca-certificates
+apt install -y git curl jq ufw ca-certificates
 
 # Enable UFW and allow necessary ports (e.g., SSH, HTTP, HTTPS)
 ufw allow OpenSSH
@@ -117,17 +117,19 @@ EOF
 cat <<EOF > app/main.py
 import os
 import logging
-import psycopg
+import psycopg 
 import requests
 import threading
 import time
 
 from fastapi import FastAPI, Response
-from prometheus_client import Counter, Gauge, generate_latest
+from prometheus_client import Counter, Gauge, generate_latest, Info
+
 
 app = FastAPI()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+START_TIME = time.time()
 
 # LOGGING
 logging.basicConfig(
@@ -144,6 +146,73 @@ FASTEST_LAP = Gauge("fastest_lap_time", "Fastest lap time")
 ACTIVE_DRIVERS = Gauge("active_drivers", "Number of active drivers")
 AVG_LAP_TIME = Gauge("avg_lap_time", "Average lap time")
 
+CURRENT_RACE_LEADER = Info(
+    "current_race_leader",
+    "Current race leader"
+)
+
+FASTEST_DRIVER = Info(
+    "fastest_driver",
+    "Driver with fastest lap"
+)
+
+FASTEST_TEAM = Info(
+    "fastest_team",
+    "Team with fastest average lap"
+)
+
+TEAM_AVG_LAP = Gauge(
+    "team_average_lap_time",
+    "Average lap time per team",
+    ["team"]
+)
+
+LAP_COUNT = Gauge(
+    "driver_lap_count",
+    "Lap count per driver",
+    ["driver"]
+)
+
+# SYSTEM INFO
+CURRENT_SESSION = Info(
+    "current_session_info",
+    "Current session information"
+)
+
+SESSION_INFO = Info("session_info", "Current F1 session info")
+
+INGESTION_COUNT = Counter(
+    "ingestion_cycles_total",
+    "Total ingestion cycles"
+)
+
+FAILED_API_REQUESTS = Counter(
+    "failed_api_requests_total",
+    "Failed API requests"
+)
+
+OPENF1_RESPONSE_TIME = Gauge(
+    "openf1_response_time_seconds",
+    "OpenF1 API response time"
+)
+
+DB_QUERY_DURATION = Gauge(
+    "db_query_duration_seconds",
+    "Database query duration"
+)
+
+API_UPTIME = Gauge(
+    "api_uptime_seconds",
+    "API uptime in seconds"
+)
+
+LAST_INGESTION_TIME = Gauge(
+    "last_ingestion_timestamp",
+    "Last successful ingestion timestamp"
+)
+
+
+# ENDPOINT MIDDLEWARE
 
 @app.middleware("http")
 async def count_requests(request, call_next):
@@ -191,6 +260,7 @@ def ingestion_loop():
             ingest_data()
         except Exception as e:
             logger.error(f"Ingestion error: {e}")
+            FAILED_API_REQUESTS.inc()
 
         time.sleep(30)
 
@@ -232,9 +302,21 @@ def root():
 def ingest_data():
     logger.info("Starting ingestion")
 
-    laps = requests.get("https://api.openf1.org/v1/laps?session_key=latest").json()
+    INGESTION_COUNT.inc()
+    api_start = time.time()
+
+    laps_response = requests.get(
+    "https://api.openf1.org/v1/laps?session_key=latest"
+    )
+
+    OPENF1_RESPONSE_TIME.set(
+        time.time() - api_start
+    )
+
+    laps = laps_response.json()
     positions = requests.get("https://api.openf1.org/v1/position?session_key=latest").json()
     drivers = requests.get("https://api.openf1.org/v1/drivers?session_key=latest").json()
+    session_info = requests.get("https://api.openf1.org/v1/sessions?session_key=latest").json()
 
     position_map = {
         p["driver_number"]: p.get("position")
@@ -251,12 +333,22 @@ def ingest_data():
         if d.get("driver_number")
     }
 
+    if session_info:
+        current = session_info[0]
+
+        CURRENT_SESSION.info({
+            "race_name": current.get("session_name", "Unknown"),
+            "session_type": current.get("session_type", "Unknown"),
+            "country": current.get("country_name", "Unknown"),
+            "circuit": current.get("circuit_short_name", "Unknown")
+        })
+
     conn = psycopg.connect(DATABASE_URL)
     cur = conn.cursor()
 
     inserted = 0
 
-    for lap in laps[:15]:
+    for lap in laps:
 
         driver_number = lap.get("driver_number")
         lap_time = lap.get("lap_duration")
@@ -316,6 +408,78 @@ def ingest_data():
     cur2.execute("SELECT AVG(lap_time) FROM telemetry")
     AVG_LAP_TIME.set(cur2.fetchone()[0] or 0)
 
+    cur2.execute("""
+        SELECT driver_name, driver_number, lap_time
+        FROM telemetry
+        WHERE lap_time IS NOT NULL
+        ORDER BY id DESC
+        LIMIT 50
+    """)
+
+    rows = cur2.fetchall()
+
+    leader = None
+    best_time = None
+
+    for driver_name, driver_number, lap_time in rows:
+        if best_time is None or lap_time < best_time:
+            best_time = lap_time
+            leader = (driver_name, driver_number, lap_time)
+
+    if leader:
+        CURRENT_RACE_LEADER.info({
+            "driver": leader[0],
+            "driver_number": str(leader[1]),
+            "lap_time": str(leader[2])
+        })
+
+    cur2.execute("""
+        SELECT driver_name, lap_time
+        FROM telemetry
+        ORDER BY lap_time ASC
+        LIMIT 1
+    """)
+
+    fastest_driver = cur2.fetchone()
+    if fastest_driver:
+        FASTEST_DRIVER.info({
+            "driver": fastest_driver[0],
+            "lap_time": str(fastest_driver[1])
+        })
+
+    cur2.execute("""
+        SELECT team_name, AVG(lap_time) AS avg_time
+        FROM telemetry
+        GROUP BY team_name
+    """)
+
+    teams = cur2.fetchall()
+
+    fastest_team_name = None
+    fastest_team_time = None
+
+    for team_name, avg_time in teams:
+        TEAM_AVG_LAP.labels(team=team_name).set(avg_time)
+
+        if fastest_team_time is None or avg_time < fastest_team_time:
+            fastest_team_time = avg_time
+            fastest_team_name = team_name
+
+    if fastest_team_name:
+        FASTEST_TEAM.info({
+            "team": fastest_team_name,
+            "avg_lap_time": str(fastest_team_time)
+        })
+
+    cur2.execute("""
+        SELECT driver_name, COUNT(*) as laps
+        FROM telemetry
+        GROUP BY driver_name
+    """)
+
+    for driver_name, laps in cur2.fetchall():
+        LAP_COUNT.labels(driver=driver_name).set(laps)
+
     conn2.close()
 
     logger.info(f"Ingestion complete. Inserted {inserted} rows")
@@ -323,8 +487,6 @@ def ingest_data():
     return inserted
 
 
-# TELEMETRY
-@app.get("/telemetry")
 def get_telemetry():
     logger.info("Telemetry endpoint called")
 
@@ -423,6 +585,35 @@ def constructors_championship():
 
 
 # METRICS ENDPOINT
+
+@app.get("/session/info")
+def session_info():
+
+    response = requests.get(
+        "https://api.openf1.org/v1/sessions?session_key=latest"
+    )
+
+    data = response.json()
+
+    if not data:
+        return {"error": "No session found"}
+
+    session = data[0]
+
+    SESSION_INFO.info({
+        "race_name": session.get("session_name", "Unknown"),
+        "session_type": session.get("session_type", "Unknown"),
+        "circuit": session.get("circuit_short_name", "Unknown"),
+        "country": session.get("country_name", "Unknown")
+    })
+
+    return {
+        "race_name": session.get("session_name"),
+        "session_type": session.get("session_type"),
+        "circuit": session.get("circuit_short_name"),
+        "country": session.get("country_name")
+    }
+
 @app.get("/metrics/telemetry")
 def telemetry_metric():
 
