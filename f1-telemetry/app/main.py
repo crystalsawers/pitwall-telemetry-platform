@@ -231,7 +231,7 @@ def ingest_data():
 
     inserted = 0
 
-    for lap in laps[:15]:
+    for lap in laps:
 
         driver_number = lap.get("driver_number")
         lap_time = lap.get("lap_duration")
@@ -292,18 +292,28 @@ def ingest_data():
     AVG_LAP_TIME.set(cur2.fetchone()[0] or 0)
 
     cur2.execute("""
-        SELECT driver_name, position
+        SELECT driver_name, driver_number, lap_time
         FROM telemetry
-        WHERE position = 1
+        WHERE lap_time IS NOT NULL
         ORDER BY id DESC
-        LIMIT 1
+        LIMIT 50
     """)
 
-    leader = cur2.fetchone()
+    rows = cur2.fetchall()
+
+    leader = None
+    best_time = None
+
+    for driver_name, driver_number, lap_time in rows:
+        if best_time is None or lap_time < best_time:
+            best_time = lap_time
+            leader = (driver_name, driver_number, lap_time)
+
     if leader:
         CURRENT_RACE_LEADER.info({
             "driver": leader[0],
-            "position": str(leader[1])
+            "driver_number": str(leader[1]),
+            "lap_time": str(leader[2])
         })
 
     cur2.execute("""
