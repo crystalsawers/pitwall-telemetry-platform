@@ -425,7 +425,7 @@ def ingest_data():
 
     return inserted
 
-
+@app.get("/telemetry")
 def get_telemetry():
     logger.info("Telemetry endpoint called")
 
