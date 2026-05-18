@@ -343,6 +343,7 @@ def ingest_data():
     for driver_name, laps in cur2.fetchall():
         LAP_COUNT.labels(driver=driver_name).set(laps)
 
+    LAST_INGESTION_TIME.set(time.time() * 1000)
     conn2.close()
 
     logger.info(f"Ingestion complete. Inserted {inserted} rows")
