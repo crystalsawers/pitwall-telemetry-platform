@@ -11,18 +11,39 @@ fi
 
 # Update and upgrade the system, then install necessary base packages
 
+echo "=========================================================================="
+echo "Updating and upgrading the system, and installing necessary packages..."
+echo "=========================================================================="
+
 apt update &&  apt upgrade -y
 apt install -y git curl ufw ca-certificates
 
 # Enable UFW and allow necessary ports (e.g., SSH, HTTP, HTTPS)
-ufw allow OpenSSH
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw allow 8000/tcp
-ufw allow 5432/tcp
+
+echo "=========================================================================="
+echo "Configuring UFW firewall..."
+echo "=========================================================================="
+
+RULES=(
+  "OpenSSH"
+  "80/tcp"
+  "443/tcp"
+  "8000/tcp"
+  "5432/tcp"
+)
+
+for rule in "${RULES[@]}"; do
+  ufw allow "$rule"
+done
+
 ufw --force enable
+ufw status verbose
 
 # Setup Docker Apt repository (this is from Docker's official installation instructions for Ubuntu)
+
+echo "=========================================================================="
+echo "Setting up Docker repository and installing Docker Engine..."
+echo "=========================================================================="
 
 # Add Docker's official GPG key:
 install -m 0755 -d /etc/apt/keyrings
@@ -44,12 +65,20 @@ apt update # Important! As it will not install at all if you don't do this first
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Verify Docker is running
+echo "=========================================================================="
+echo "Verifying Docker installation..."
+echo "=========================================================================="
 systemctl status docker --no-pager
 
 if [ $? -ne 0 ]; then
     echo "Docker is not running. Starting Docker."
     systemctl start docker
     systemctl enable docker
+    systemctl status docker --no-pager
 fi
 
-echo "Basic setup completed. You can verify Docker installation by running 'docker run hello-world' or 'docker --version', and then 'docker ps' to check."
+docker --version
+
+echo "=========================================================================="
+echo "Basic setup completed. 
+echo "=========================================================================="

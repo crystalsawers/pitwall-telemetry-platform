@@ -10,6 +10,10 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Create the f1-telemetry directory for files to be put in
+echo "==============================================================="
+echo "Creating f1-telemetry directory and files..."
+echo "==============================================================="
+
 mkdir -p f1-telemetry/app
 cd f1-telemetry
 
@@ -17,6 +21,10 @@ cd f1-telemetry
 touch  .env Dockerfile docker-compose.yml requirements.txt app/main.py
 
 # Populate the files
+echo "==============================================================="
+echo "Populating all files with content..."
+echo "==============================================================="
+
 
 # .env
 cat <<EOF > .env
@@ -56,10 +64,12 @@ EOF
 cat <<EOF > app/main.py
 import os
 import logging
-import psycopg 
+import psycopg
 import requests
 import threading
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, Response
 from prometheus_client import Counter, Gauge, generate_latest, Info
@@ -90,9 +100,10 @@ CURRENT_RACE_LEADER = Info(
     "Current race leader"
 )
 
-FASTEST_DRIVER = Info(
-    "fastest_driver",
-    "Driver with fastest lap"
+FASTEST_DRIVER = Gauge(
+    "fastest_driver_lap_time",
+    "Fastest driver lap time",
+    ["driver_full"]
 )
 
 FASTEST_TEAM = Info(
@@ -348,43 +359,20 @@ def ingest_data():
     AVG_LAP_TIME.set(cur2.fetchone()[0] or 0)
 
     cur2.execute("""
-        SELECT driver_name, driver_number, lap_time
+        SELECT driver_name, MIN(lap_time)
         FROM telemetry
-        WHERE lap_time IS NOT NULL
-        ORDER BY id DESC
-        LIMIT 50
-    """)
-
-    rows = cur2.fetchall()
-
-    leader = None
-    best_time = None
-
-    for driver_name, driver_number, lap_time in rows:
-        if best_time is None or lap_time < best_time:
-            best_time = lap_time
-            leader = (driver_name, driver_number, lap_time)
-
-    if leader:
-        CURRENT_RACE_LEADER.info({
-            "driver": leader[0],
-            "driver_number": str(leader[1]),
-            "lap_time": str(leader[2])
-        })
-
-    cur2.execute("""
-        SELECT driver_name, lap_time
-        FROM telemetry
-        ORDER BY lap_time ASC
+        GROUP BY driver_name
+        ORDER BY MIN(lap_time)
         LIMIT 1
     """)
 
     fastest_driver = cur2.fetchone()
+
     if fastest_driver:
-        FASTEST_DRIVER.info({
-            "driver": fastest_driver[0],
-            "lap_time": str(fastest_driver[1])
-        })
+        FASTEST_DRIVER.labels(
+            driver_full=fastest_driver[0]
+        ).set(fastest_driver[1])
+
 
     cur2.execute("""
         SELECT team_name, AVG(lap_time) AS avg_time
@@ -419,6 +407,7 @@ def ingest_data():
     for driver_name, laps in cur2.fetchall():
         LAP_COUNT.labels(driver=driver_name).set(laps)
 
+    LAST_INGESTION_TIME.set(time.time() * 1000)
     conn2.close()
 
     logger.info(f"Ingestion complete. Inserted {inserted} rows")
@@ -478,7 +467,7 @@ def get_telemetry():
 @app.get("/championship/drivers")
 def drivers_championship():
 
-    session_key = get_latest_race_session()
+    session_key = "latest"
 
     if not session_key:
         return {"error": "No race session found"}
@@ -488,7 +477,26 @@ def drivers_championship():
     )
 
     data = response.json()
-    data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
+
+    drivers = requests.get(
+        "https://api.openf1.org/v1/drivers?session_key=latest"
+    ).json()
+
+    driver_map = {
+        d["driver_number"]: d.get("full_name", "Unknown")
+        for d in drivers
+    }
+
+    for d in data:
+        d["driver_name"] = driver_map.get(d["driver_number"], "Unknown")
+
+    if isinstance(data, dict):
+        data = [data]
+
+    data.sort(
+        key=lambda x: x.get("points_current", 0),
+        reverse=True
+    )
 
     logger.info("Drivers championship fetched")
 
@@ -502,7 +510,7 @@ def drivers_championship():
 @app.get("/championship/constructors")
 def constructors_championship():
 
-    session_key = get_latest_race_session()
+    session_key = "latest"
 
     if not session_key:
         return {"error": "No race session found"}
@@ -512,7 +520,14 @@ def constructors_championship():
     )
 
     data = response.json()
-    data.sort(key=lambda x: x.get("points_current", 0), reverse=True)
+
+    if isinstance(data, dict):
+        data = [data]
+
+    data.sort(
+        key=lambda x: x.get("points_current", 0),
+        reverse=True
+    )
 
     logger.info("Constructors championship fetched")
 
@@ -539,18 +554,43 @@ def session_info():
 
     session = data[0]
 
+    meeting_response = requests.get(
+        f"https://api.openf1.org/v1/meetings?meeting_key={session['meeting_key']}"
+    )
+
+    meeting_data = meeting_response.json()
+
+    if meeting_data:
+        meeting = meeting_data[0]
+        meeting_name = meeting.get("meeting_name", "Unknown")
+
+        meeting_start_raw = meeting.get("date_start", None)
+
+        if meeting_start_raw:
+            meeting_start = datetime.fromisoformat(
+            meeting_start_raw.replace("Z", "+00:00")
+        ).astimezone(ZoneInfo("Pacific/Auckland")).strftime("%A %d %B %Y %H:%M %Z")
+        else:
+            meeting_start = None
+    else:
+        meeting_name = "Unknown"
+        meeting_start = None
+
+
     SESSION_INFO.info({
-        "race_name": session.get("session_name", "Unknown"),
+        "race_name": meeting_name,
         "session_type": session.get("session_type", "Unknown"),
         "circuit": session.get("circuit_short_name", "Unknown"),
-        "country": session.get("country_name", "Unknown")
+        "country": session.get("country_name", "Unknown"),
+        "meeting_start": meeting_start
     })
 
     return {
-        "race_name": session.get("session_name"),
+        "race_name": meeting_name,
         "session_type": session.get("session_type"),
         "circuit": session.get("circuit_short_name"),
-        "country": session.get("country_name")
+        "country": session.get("country_name"),
+        "meeting_start": meeting_start
     }
 
 @app.get("/metrics/telemetry")
@@ -633,8 +673,15 @@ networks:
 EOF
 
 # Run the containers
+echo "==============================================================="
+echo "Building and starting containers with Docker Compose..."
+echo "==============================================================="
+
 docker compose up -d --build
 
+echo "=============================================================="
+echo " Container Stack "
+echo "=============================================================="
 echo "Containers created and running."
 echo "Access the FastAPI app with: curl http://localhost:8000"
 echo ""
@@ -655,3 +702,4 @@ echo "cd f1-telemetry && docker exec -it postgres_db psql -U postgres -d f1_tele
 echo ""
 echo "Current running containers:"
 docker ps
+echo "=============================================================="
