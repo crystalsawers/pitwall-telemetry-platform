@@ -416,22 +416,14 @@ cat <<EOF > monitoring/grafana/provisioning/dashboards-json/f1-telemetry-data.js
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "team_average_lap_time",
+          "expr": "bottomk(1, team_average_lap_time)",
           "instant": true,
-          "legendFormat": "__auto",
+          "legendFormat": "{{team}}",
           "range": false,
           "refId": "A"
         }
       ],
       "title": "Fastest Team",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "keepLabels": ["team"]
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -490,21 +482,13 @@ cat <<EOF > monitoring/grafana/provisioning/dashboards-json/f1-telemetry-data.js
           },
           "editorMode": "code",
           "expr": "fastest_driver_lap_time",
-          "legendFormat": "__auto",
+          "legendFormat": "{{driver_full}}",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
       "title": "Driver with Fastest Lap",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "keepLabels": ["driver_full"]
-          }
-        }
-      ],
       "type": "stat"
     },
     {
