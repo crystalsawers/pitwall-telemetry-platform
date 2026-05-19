@@ -16,7 +16,7 @@ echo "Updating and upgrading the system, and installing necessary packages..."
 echo "=========================================================================="
 
 apt update &&  apt upgrade -y
-apt install -y git curl ufw ca-certificates
+apt install -y git curl jq ufw ca-certificates
 
 # Enable UFW and allow necessary ports (e.g., SSH, HTTP, HTTPS)
 
@@ -80,5 +80,5 @@ fi
 docker --version
 
 echo "=========================================================================="
-echo "Basic setup completed. 
+echo "Basic setup completed. "
 echo "=========================================================================="

@@ -609,6 +609,17 @@ def telemetry_metric():
     }
 EOF
 
+# -----------------------------
+# Create Docker network
+# -----------------------------
+echo "==========================================================="
+echo "Creating Docker network if missing..."
+echo "==========================================================="
+
+docker network inspect telemetry-network >/dev/null 2>&1 || \
+docker network create telemetry-network
+
+
 # docker-compose.yml
 cat <<EOF > docker-compose.yml
 services:
@@ -700,6 +711,9 @@ echo ""
 echo "The telemetry table is now created automatically on container startup."
 echo "The /telemetry endpoint automatically fetches and stores fresh OpenF1 data before returning results."
 echo ""
+echo " To see running containers: "
+echo "docker ps"
+echo ""
 echo "To stop the containers:"
 echo "cd f1-telemetry && docker compose down"
 echo ""
@@ -711,6 +725,4 @@ echo ""
 echo "To access the PostgreSQL database:"
 echo "cd f1-telemetry && docker exec -it postgres_db psql -U postgres -d f1_telemetry"
 echo ""
-echo "Current running containers:"
-docker ps
 echo "=============================================================="

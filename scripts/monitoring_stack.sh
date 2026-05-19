@@ -149,11 +149,16 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
 
+    environment:
+    - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+
     ports:
       - "3000:3000"
 
     volumes:
       - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards-json:/var/lib/grafana/dashboards
 
     restart: unless-stopped
 
@@ -190,15 +195,12 @@ services:
 
     command: -config.file=/etc/promtail/config.yml
 
-    restart: unless-stopped
-
     networks:
       - telemetry-network
 
 
 volumes:
   grafana-storage:
-
 
 networks:
   telemetry-network:
