@@ -20,23 +20,9 @@ The goal is to demonstrate practical skills in:
 - Observability and system design
 
 ---
-
-## System Architecture
-
-The platform is designed as a distributed system rather than a monolithic application.
-
-### Core Design Principles
-- Microservices-based architecture
-- Event-driven communication patterns
-- Cloud-native deployment model
-- Infrastructure defined as code
-- Observability-first design
-
----
-
 ## ☁️ Infrastructure
 
-The system is built around a Kubernetes-based core running on **Google Kubernetes Engine (GKE)**, with supporting cloud services.
+The system is currently built on the **Google Compute Engine**, otherwise known as the Virtual Machine. There weill be further developments on this, potentially migrating to Kubernetes later.
 
 ### Application Layer
 - Multiple FastAPI microservices
@@ -60,7 +46,6 @@ The system is built around a Kubernetes-based core running on **Google Kubernete
 ### Cloud Infrastructure
 - Google Kubernetes Engine (GKE)
 - Compute Engine (supporting workloads and isolated testing)
-- Cloud Storage (backups and long-term data storage)
 - Terraform for infrastructure provisioning
 
 ### Automation & CI/CD
@@ -93,19 +78,18 @@ To manage this:
 
 ## Development Phases
 
-This project is split into a structured 3-part progression, documented as a blog series covering infrastructure setup, automation, scaling, and production-grade DevOps practices.
+This project is broken down into several phases, documented as a blog series. This was initially planned as a 3-part series, but has been extended to 4 parts, with a potential 5th depending on time and remaining Google Cloud credits.
 
 ---
 
 ### Part 1 - Core System & Initial Automation (Phase 1-2)
 
 📘 Docs: [/docs/phase 1-2.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%201-2.md)
-
 📝 Blog: [The Art of Google Cloud (Part 1)](https://loglapandover.co.nz/projects/devops/P9McSw1XKxtBUFpzdg4g)
 
 #### Phase 1 - Core System Build
 
-* Google Cloud Console (Compute Engine)
+* Google Cloud Compute Engine (VM provisioning)
 * VPC networking and firewall configuration
 * Ubuntu Server setup
 * SSH access configuration
@@ -114,96 +98,168 @@ This project is split into a structured 3-part progression, documented as a blog
 * PostgreSQL database
 * Initial containerised application deployment
 
-**Outcome:** A fully working VM running a containerised API + database stack.
-
 ---
 
 #### Phase 2 - Infrastructure Automation
 
 * Google Cloud Console + Cloud Shell
 * `gcloud` CLI automation
-* Startup scripts for instance bootstrapping
-* Instance templates for repeatable deployment
+* Startup scripts for VM bootstrapping
+* Instance templates for repeatable deployments
 * Docker + Docker Compose automation
-* Integration of real Formula 1 telemetry/data sources (initial ingestion experiments)
-
-**Outcome:** Repeatable infrastructure setup with scripted deployment instead of manual configuration. But you have to actually understand the manual configuration first. 
+* Initial telemetry-style data ingestion experiments
 
 ---
 
-### Part 2 - Scaling, Observability & Security (Phase 3-5)
+### Part 2 - Service Expansion, Observability & Security Foundations (Phase 3-5)
 
-📘 Docs: (coming soon)  
+📘 Docs: (coming soon)
 📝 Blog: (coming soon)
-
-**Focus:** Moving from a single VM system to a managed, scalable cloud-native architecture.
-
-#### Phase 3 - Kubernetes Orchestration
-
-* Google Kubernetes Engine (GKE)
-* Container orchestration and service deployment
-* Scaling microservices architecture
-
-#### Phase 4 - Observability Stack
-
-* Google Cloud Operations Suite
-
-  * Cloud Monitoring
-  * Cloud Logging
-* System metrics, logs, and dashboards
-* Service health visibility
-
-#### Phase 5 - Security & Access Control
-
-* IAM roles and permissions
-* VPC firewall policy refinement
-* Secret Manager for credential handling
-
-**Outcome:** A scalable, observable, and security-hardened cloud-native system.
 
 ---
 
-### Part 3 - Production Automation & IaC (Phase 6-7)
+#### Phase 3 - Monitoring Stack & Telemetry Foundation
 
-📘 Docs: (coming soon)  
+* Deployment of observability stack for system visibility (Prometheus, Grafana, Loki)
+* Integration of monitoring tools with FastAPI-based telemetry services
+* Collection of metrics, logs, and application-level signals
+* Initial exposure of F1-style telemetry data into monitoring dashboards
+* Structuring services to support observable, event-driven architecture
+* Establishing baseline system health tracking across containers and VMs
+
+---
+
+#### Phase 4 - Security & Access Control
+
+* IAM (Identity and Access Management)
+
+  * Role-based access control (RBAC)
+  * Service account creation and management
+  * Principle of least privilege
+* VPC Firewall Policies
+
+  * Explicit allow rules for required services
+  * Controlled exposure of FastAPI and monitoring ports
+  * Network tagging for firewall targeting
+* Secret Manager
+
+  * Secure storage of credentials and API keys
+  * Removal of sensitive data from `.env` files and repositories
+* Early Security Automation
+
+  * Bash and `gcloud`-based infrastructure scripting
+  * Partial automation of provisioning and security setup
+
+---
+
+#### Phase 5 - Managed Application Services
+
+* Cloud Run for serverless container deployment
+* Cloud SQL for managed database services
+* Container deployment to managed runtime environments
+* Secure and managed database connectivity between services
+* Transition from self-managed infrastructure to Google-managed services
+
+---
+
+### Part 3 - CI/CD, Container Orchestration & Infrastructure (Phase 6-8)
+
+📘 Docs: (coming soon)
 📝 Blog: (coming soon)
 
-**Focus:** Full production-style automation and infrastructure management.
+#### Phase 6 - CI/CD Automation
 
-#### Phase 6 - CI/CD Pipelines
+* Google Cloud Build pipelines
+* GitHub integration
+* Automated container builds and deployments
+* Continuous delivery workflows
 
-* Google Cloud Build
-* Automated testing and deployment pipelines
-* Continuous delivery of containerised services
+---
 
-#### Phase 7 - Infrastructure as Code
+#### Phase 7 - Container Registry & Orchestration
 
-* Artifact Registry (container management)
-* Terraform for infrastructure provisioning (optional but recommended)
-* Fully reproducible cloud environments
+* Artifact Registry for container image management
+* Image versioning and lifecycle handling
+* Google Kubernetes Engine (GKE) introduction
+* Kubernetes deployments, services, and scaling concepts
+* Transition from container builds → orchestrated cluster deployment
 
-**Outcome:** End-to-end automated deployment pipeline with infrastructure defined as code.
+---
+
+#### Phase 8 - Infrastructure as Code
+
+* Terraform-based infrastructure provisioning
+* Reusable environment definitions
+* Fully reproducible cloud setups
+* Standardised infrastructure deployment workflows
+
+---
+
+### Part 4 - Reliability & Advanced Security (Phase 9-10)
+
+📘 Docs: (coming soon)
+📝 Blog: (coming soon)
+
+---
+
+#### Phase 9 - Reliability Engineering & High Availability
+
+* Load balancing strategies
+* Rolling updates and deployment strategies
+* Autoscaling concepts
+* Health checks and self-healing systems
+* Backup and disaster recovery testing
+
+---
+
+#### Phase 10 - Advanced Security & DevSecOps
+
+* Container vulnerability scanning
+* IAM hardening practices
+* Workload Identity concepts
+* Network policy enforcement
+* Secret rotation strategies
+* CI/CD security integration
+
+---
+
+### Part 5 - Event-Driven Systems & Data Engineering (Phase 11+)
+
+📘 Docs: (coming soon)
+📝 Blog: (coming soon)
+
+---
+
+#### Phase 11 - Event-Driven Telemetry Systems
+
+* Pub/Sub-based architecture
+* Asynchronous processing pipelines
+* Queue-based worker systems
+* Real-time telemetry ingestion
+
+---
+
+#### Phase 12 - Data Analytics & Telemetry Platforms
+
+* BigQuery for telemetry storage
+* ETL pipelines for data processing
+* Historical performance analysis
+* Analytics dashboards
+
+---
+
+#### Phase 13 - Site Reliability Engineering & Operations
+
+* Alerting systems and SLIs/SLOs
+* Incident response workflows
+* Synthetic monitoring
+* Chaos engineering experiments
+* Operational runbooks
 
 ---
 
 ## Current Status
 
-**Phase 1 & 2:** Initial working system (single-node deployment with containerised API + database), Done
+**Phase 5:** Cloud Run and Cloud SQL, in progress
 
-**Phase 1** is the experiment of using Compute Engine inside the Console, while **Phase 2** involves using a script to set everything up.
-
-**Next:** Phase 3 - Kubernetes Orchestration
-
----
-
-## Goal
-
-To build a production-style cloud-native telemetry platform that demonstrates real-world skills in:
-
-- Distributed systems design
-- Google Cloud architecture
-- Kubernetes operations
-- DevOps automation
-- Infrastructure as Code
-
-All within a constrained free-tier environment to simulate real-world engineering trade-offs.
+**Next Phase:** Phase 6 - CI/CD Intergration
