@@ -53,7 +53,7 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ## Phase 3: Observability & Monitoring
 
-![image](/pitwall-telemetry-platform/docs/images/loki-logs.png)
+[![image](/pitwall-telemetry-platform/docs/images/loki-logs.png)](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/loki-logs.png)
 
 <br>
 
