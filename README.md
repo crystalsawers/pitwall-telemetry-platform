@@ -85,6 +85,7 @@ This project is broken down into several phases, documented as a blog series. Th
 ### Part 1 - Core System & Initial Automation (Phase 1-2)
 
 📘 Docs: [/docs/phase 1-2.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%201-2.md)
+
 📝 Blog: [The Art of Google Cloud (Part 1)](https://loglapandover.co.nz/projects/devops/P9McSw1XKxtBUFpzdg4g)
 
 #### Phase 1 - Core System Build
@@ -113,8 +114,9 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ### Part 2 - Service Expansion, Observability & Security Foundations (Phase 3-5)
 
-📘 Docs: (coming soon)
-📝 Blog: (coming soon)
+📘 Docs: [/docs/phase 3-4-5.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%203-4-5.md)
+
+📝 Blog: [The Art of Google Cloud (Part 2)](https://loglapandover.co.nz/projects/devops/rUzNh2L9nTWgyQQjpVf3)
 
 
 #### Phase 3 - Monitoring Stack & Telemetry Foundation
@@ -164,6 +166,7 @@ This project is broken down into several phases, documented as a blog series. Th
 ### Part 3 - CI/CD, Container Orchestration & Infrastructure (Phase 6-8)
 
 📘 Docs: (coming soon)
+
 📝 Blog: (coming soon)
 
 #### Phase 6 - CI/CD Automation
@@ -199,6 +202,7 @@ This project is broken down into several phases, documented as a blog series. Th
 ### Part 4 - Reliability & Advanced Security (Phase 9-10)
 
 📘 Docs: (coming soon)
+
 📝 Blog: (coming soon)
 
 
@@ -227,6 +231,7 @@ This project is broken down into several phases, documented as a blog series. Th
 ### Part 5 - Event-Driven Systems & Data Engineering (Phase 11+)
 
 📘 Docs: (coming soon)
+
 📝 Blog: (coming soon)
 
 
