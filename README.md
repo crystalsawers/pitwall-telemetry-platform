@@ -98,7 +98,7 @@ This project is broken down into several phases, documented as a blog series. Th
 * PostgreSQL database
 * Initial containerised application deployment
 
----
+
 
 #### Phase 2 - Infrastructure Automation
 
@@ -116,7 +116,6 @@ This project is broken down into several phases, documented as a blog series. Th
 📘 Docs: (coming soon)
 📝 Blog: (coming soon)
 
----
 
 #### Phase 3 - Monitoring Stack & Telemetry Foundation
 
@@ -127,7 +126,6 @@ This project is broken down into several phases, documented as a blog series. Th
 * Structuring services to support observable, event-driven architecture
 * Establishing baseline system health tracking across containers and VMs
 
----
 
 #### Phase 4 - Security & Access Control
 
@@ -150,15 +148,16 @@ This project is broken down into several phases, documented as a blog series. Th
   * Bash and `gcloud`-based infrastructure scripting
   * Partial automation of provisioning and security setup
 
----
 
-#### Phase 5 - Managed Application Services
+#### Phase 5 – Managed Application Services (Design & Migration Planning)
 
-* Cloud Run for serverless container deployment
-* Cloud SQL for managed database services
-* Container deployment to managed runtime environments
-* Secure and managed database connectivity between services
-* Transition from self-managed infrastructure to Google-managed services
+* Architectural planning for migration from VM-based Docker Compose to managed Google Cloud services
+* Identification of stateless vs stateful components within the system
+* Designing how FastAPI will evolve into a Cloud Run-compatible service (serverless-ready structure)
+* Planning database migration from local PostgreSQL container to Cloud SQL
+* Designing secure service-to-database connectivity in a managed environment (IAM-based access, connection abstraction)
+* Understanding decoupling of application logic from infrastructure dependencies
+* Preparation for future CI/CD-driven container deployment workflows
 
 ---
 
@@ -174,17 +173,19 @@ This project is broken down into several phases, documented as a blog series. Th
 * Automated container builds and deployments
 * Continuous delivery workflows
 
----
+
 
 #### Phase 7 - Container Registry & Orchestration
 
 * Artifact Registry for container image management
 * Image versioning and lifecycle handling
+* Cloud Run for serverless container deployment of application services
+* Cloud SQL for managed database services and production database hosting
 * Google Kubernetes Engine (GKE) introduction
 * Kubernetes deployments, services, and scaling concepts
 * Transition from container builds → orchestrated cluster deployment
 
----
+
 
 #### Phase 8 - Infrastructure as Code
 
@@ -200,7 +201,7 @@ This project is broken down into several phases, documented as a blog series. Th
 📘 Docs: (coming soon)
 📝 Blog: (coming soon)
 
----
+
 
 #### Phase 9 - Reliability Engineering & High Availability
 
@@ -210,7 +211,7 @@ This project is broken down into several phases, documented as a blog series. Th
 * Health checks and self-healing systems
 * Backup and disaster recovery testing
 
----
+
 
 #### Phase 10 - Advanced Security & DevSecOps
 
@@ -228,7 +229,6 @@ This project is broken down into several phases, documented as a blog series. Th
 📘 Docs: (coming soon)
 📝 Blog: (coming soon)
 
----
 
 #### Phase 11 - Event-Driven Telemetry Systems
 
@@ -237,7 +237,6 @@ This project is broken down into several phases, documented as a blog series. Th
 * Queue-based worker systems
 * Real-time telemetry ingestion
 
----
 
 #### Phase 12 - Data Analytics & Telemetry Platforms
 
@@ -246,7 +245,6 @@ This project is broken down into several phases, documented as a blog series. Th
 * Historical performance analysis
 * Analytics dashboards
 
----
 
 #### Phase 13 - Site Reliability Engineering & Operations
 
@@ -260,6 +258,6 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ## Current Status
 
-**Phase 5:** Cloud Run and Cloud SQL, in progress
+**Phase 5:**  Managed Application Services (Design & Migration Planning), in progress
 
-**Next Phase:** Phase 6 - CI/CD Intergration
+**Next Phase:** Phase 6 - CI/CD Integration
