@@ -53,7 +53,7 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ## Phase 3: Observability & Monitoring
 
-[![image](/pitwall-telemetry-platform/docs/images/loki-logs.png)](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/loki-logs.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/loki-logs.png)
 
 <br>
 
@@ -67,7 +67,7 @@ A lot of this task was involving the scripting and automation part anyway, but I
 
 <br>
 
-![image](/pitwall-telemetry-platform/docs/images/f1-data-dashboard-1.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/f1-data-dashboard-1.png)
 
 <br>
 The dashboard part itself was split into two dashboards, one for the actual F1 data, the other for the overall system of the telemetry. For both dashboards, I split multiple sections so the most important information could be seen immediately at the top. I'll go through the **F1 Telemetry Data** dashboard first. The first section focused on quick overview statistics, including the current session information (which at the time of setup, the last race that took place was the Miami Grand Prix), the name of the driver with the fastest lap along with their lap time using the clock (s) unit format (it was the closest I could get to the real F1 style timing format), and the fastest team based on average lap time. Though the API endpoint does calculate it for all of the teams, this chooses the quickest one. These panels mainly used Prometheus metrics and Grafana stat panels to display "live" telemetry values in a simple format. Because the OpenF1 API requires a subscription for actual live data, I persisted with the latest information from the race. 
@@ -76,10 +76,9 @@ The middle section focused more on comparative data visualisation. This included
 
 <br>
 
-![image](/pitwall-telemetry-platform/docs/images/f1-data-dashboard-2.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/f1-data-dashboard-2.png)
 
-
-![image](/pitwall-telemetry-platform/docs/images/f1-data-dashboard-3.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/f1-data-dashboard-3.png)
 
 
 <br>
@@ -88,10 +87,9 @@ The bottom section focused on structured table data pulled directly from the Fas
 
 <br>
 
-![image](/pitwall-telemetry-platform/docs/images/f1-system-dashboard-2.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/f1-system-dashboard-1.png)
 
-
-![image](/pitwall-telemetry-platform/docs/images/f1-system-dashboard-3.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/f1-system-dashboard-2.png)
 
 
 <br>
@@ -140,10 +138,9 @@ This helps reduce unnecessary access and improves overall platform security. In 
 
 <br>
 
-![image](/pitwall-telemetry-platform/docs/images/iam-roles-1.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/iam-roles-1.png)
 
-
-![image](/pitwall-telemetry-platform/docs/images/iam-roles-2.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/iam-roles-1.png)
 
 
 <br>
@@ -177,13 +174,7 @@ This includes:
 
 Applications can retrieve secrets securely at runtime, improving both operational management and security practices.
 
-<br>
-
-<video src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FSecret-Manager-Test.mp4?alt=media&token=4aca50e3-7620-4254-a7c8-2a74f5fa1dde" width="1000" height="500" controls></video>
-
-<br>
-
-First of all, it's found deep into the "Security" section of the console, and I enabled the API for it. Here's a short clip of creating a "test" password as an example, which I **promptly deleted** after. This was just a tester for when doing the actual thing with the environment variables later in the phase.
+First of all, it's found deep into the "Security" section of the console, and I enabled the API for it. A short clip is on my blog post link of creating a "test" password as an example, which I **promptly deleted** after. This was just a tester for when doing the actual thing with the environment variables later in the phase.
 
 
 ### 4.3: VPC Firewall Policies
@@ -201,7 +192,7 @@ This reduces the attack surface of the environment while maintaining required co
 
 <br>
 
-![image](/pitwall-telemetry-platform/docs/images/vpc-firewall.png)
+![image](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/images/vpc-firewall.png)
 
 <br>
 
