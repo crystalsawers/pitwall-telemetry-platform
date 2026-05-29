@@ -448,6 +448,21 @@ def get_telemetry():
 
     data = list(leaderboard.values())
 
+    for entry in data:
+        laps = entry["lap_number"] or 0
+        pos = entry["position"]
+
+        if laps == 0:
+            entry["status"] = "DNS"
+        elif entry["position"] is None:
+            entry["status"] = "DNF"
+        else:
+            entry["status"] = "Finished"
+
+        entry["display_position"] = (
+            pos if entry["status"] == "Finished" else entry["status"]
+        )
+
     data.sort(
         key=lambda x: (
             x["position"] if x["position"] is not None else 999,
@@ -564,12 +579,14 @@ def session_info():
         meeting = meeting_data[0]
         meeting_name = meeting.get("meeting_name", "Unknown")
 
-        meeting_start_raw = meeting.get("date_start", None)
+        session_start_raw = session.get("date_start", None)
 
-        if meeting_start_raw:
+        if session_start_raw:
             meeting_start = datetime.fromisoformat(
-            meeting_start_raw.replace("Z", "+00:00")
-        ).astimezone(ZoneInfo("Pacific/Auckland")).strftime("%A %d %B %Y %H:%M %Z")
+                session_start_raw.replace("Z", "+00:00")
+            ).astimezone(
+                ZoneInfo("Pacific/Auckland")
+            ).strftime("%A %d %B %Y %H:%M %Z")
         else:
             meeting_start = None
     else:
