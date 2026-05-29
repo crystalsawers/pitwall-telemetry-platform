@@ -175,23 +175,24 @@ This project is broken down into several phases, documented as a blog series. Th
 * GitHub integration
 * Automated container builds and deployments
 * Continuous delivery workflows
-
-
-
-#### Phase 7 - Container Registry & Orchestration
-
 * Artifact Registry for container image management
+* Separate app repo for demonstration - [f1-telemetry-app](https://github.com/crystalsawers/f1-telemetry-app)
+
+
+
+#### Phase 7 - Cloud Run & Cloud SQL
+
 * Image versioning and lifecycle handling
 * Cloud Run for serverless container deployment of application services
 * Cloud SQL for managed database services and production database hosting
+
+
+
+#### Phase 8 - Kubernetes & Terraform
+
 * Google Kubernetes Engine (GKE) introduction
 * Kubernetes deployments, services, and scaling concepts
 * Transition from container builds → orchestrated cluster deployment
-
-
-
-#### Phase 8 - Infrastructure as Code
-
 * Terraform-based infrastructure provisioning
 * Reusable environment definitions
 * Fully reproducible cloud setups
@@ -263,6 +264,6 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ## Current Status
 
-**Phase 5:**  Managed Application Services (Design & Migration Planning), in progress
+**Phase 6:**  Artifact Registry & CI/CD Integration, DONE
 
-**Next Phase:** Phase 6 - CI/CD Integration
+**Next Phase:** Phase 7 - Cloud Run and Cloud SQL
