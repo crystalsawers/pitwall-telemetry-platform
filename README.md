@@ -264,6 +264,6 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ## Current Status
 
-**Phase 6:**  Artifact Registry & CI/CD Integration, DONE
+**Phase 7:**  Cloud Run and Cloud SQL, DONE
 
-**Next Phase:** Phase 7 - Cloud Run and Cloud SQL
+**Next Phase:** Phase8 - Kubernetes

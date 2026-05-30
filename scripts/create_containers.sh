@@ -199,7 +199,10 @@ def init_db():
     logger.info("Database ready")
 
 
-init_db()
+try:
+    init_db()
+except Exception as e:
+    logger.error(f"DB init failed: {e}")
 
 
 # BACKGROUND INGESTION LOOP
