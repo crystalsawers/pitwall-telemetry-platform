@@ -1986,3 +1986,114 @@ data:
     "uid": "adncvfk",
     "id": 1802620253843456
     }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: default
+  labels:
+    monitoring: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      monitoring: grafana
+  template:
+    metadata:
+      labels:
+        monitoring: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana
+        ports:
+        - containerPort: 3000
+
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: GF_SECURITY_ADMIN_USER
+
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: GF_SECURITY_ADMIN_PASSWORD
+
+        - name: GF_INSTALL_PLUGINS
+          value: yesoreyeram-infinity-datasource
+
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+
+        volumeMounts:
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+
+        - name: grafana-dashboard-provider
+          mountPath: /etc/grafana/provisioning/dashboards
+
+      volumes:
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboard-files
+
+      - name: grafana-dashboard-provider
+        configMap:
+          name: grafana-dashboard-provider
+
+      nodeSelector:
+        cloud.google.com/compute-class: autopilot
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: grafana-hpa
+  namespace: default
+  labels:
+    monitoring: grafana
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: grafana
+    apiVersion: apps/v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+  namespace: default
+  labels:
+    monitoring: grafana
+spec:
+  selector:
+    monitoring: grafana
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+  type: LoadBalancer
