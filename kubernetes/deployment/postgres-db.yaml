@@ -1,0 +1,89 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "postgres-db-config-ou5y"
+  namespace: "default"
+  labels:
+    database: "postgres-db"
+data:
+  POSTGRES_USER: "fastapi-postgres"
+  POSTGRES_PASSWORD: "fastapipostgres79"
+  POSTGRES_DB: "telemetry_db"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "postgres-db"
+  namespace: "default"
+  labels:
+    database: "postgres-db"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      database: "postgres-db"
+  template:
+    metadata:
+      labels:
+        database: "postgres-db"
+    spec:
+      containers:
+      - name: "postgres-1"
+        image: "postgres:16"
+        env:
+        - name: "POSTGRES_USER"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_USER"
+              name: "postgres-db-config-ou5y"
+        - name: "POSTGRES_PASSWORD"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_PASSWORD"
+              name: "postgres-db-config-ou5y"
+        - name: "POSTGRES_DB"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_DB"
+              name: "postgres-db-config-ou5y"
+      nodeSelector:
+        cloud.google.com/compute-class: "autopilot"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "postgres-db-hpa-mtok"
+  namespace: "default"
+  labels:
+    database: "postgres-db"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "postgres-db"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "postgres-db-service"
+  namespace: "default"
+  labels:
+    database: "postgres-db"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 5432
+    targetPort: 5432
+  selector:
+    database: "postgres-db"
+  type: "ClusterIP"

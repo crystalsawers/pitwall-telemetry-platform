@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-app-config-yxwt
+  namespace: default
+  labels:
+    app: fastapi-app
+data:
+  DB_HOST: "postgres-db-service"
+  DB_PORT: "5432"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+  namespace: default
+  labels:
+    app: fastapi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: f1-telemetry-api-sha256-1
+        image: australia-southeast1-docker.pkg.dev/project-1f40dd62-739c-473a-b20/f1-stack/f1-telemetry-api@sha256:dc951b017678db9c22071bcf294eed4b133f2d156e347b99a4d7cf5d643b5062
+
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: fastapi-app-config-yxwt
+              key: DB_HOST
+
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: fastapi-app-config-yxwt
+              key: DB_PORT
+
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)"
+
+      nodeSelector:
+        cloud.google.com/compute-class: autopilot
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fastapi-app-hpa-hdmy
+  namespace: default
+  labels:
+    app: fastapi-app
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: fastapi-app
+    apiVersion: apps/v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-app-service
+  namespace: default
+  labels:
+    app: fastapi-app
+spec:
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  selector:
+    app: fastapi-app
+  type: LoadBalancer
