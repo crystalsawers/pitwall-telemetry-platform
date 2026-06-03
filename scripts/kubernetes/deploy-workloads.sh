@@ -230,7 +230,7 @@ spec:
               key: DB_PORT
 
         - name: DATABASE_URL
-          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)"
+          value: "postgresql://\$(POSTGRES_USER):\$(POSTGRES_PASSWORD)@\$(DB_HOST):\$(DB_PORT)/\$(POSTGRES_DB)"
 
       nodeSelector:
         cloud.google.com/compute-class: autopilot
