@@ -2677,28 +2677,6 @@ spec:
       nodeSelector:
         cloud.google.com/compute-class: autopilot
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: grafana-hpa
-  namespace: default
-  labels:
-    monitoring: grafana
-spec:
-  scaleTargetRef:
-    kind: Deployment
-    name: grafana
-    apiVersion: apps/v1
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 80
----
 apiVersion: v1
 kind: Service
 metadata:
