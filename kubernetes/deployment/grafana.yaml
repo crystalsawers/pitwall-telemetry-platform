@@ -2028,11 +2028,11 @@ spec:
 
         resources:
           requests:
-            cpu: 250m
-            memory: 512Mi
+            cpu: 100m
+            memory: 128Mi
           limits:
-            cpu: 500m
-            memory: 1Gi
+            cpu: 300m
+            memory: 256Mi
 
         volumeMounts:
         - name: grafana-datasources

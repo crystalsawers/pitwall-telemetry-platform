@@ -1,16 +1,3 @@
----
-apiVersion: "v1"
-kind: "ConfigMap"
-metadata:
-  name: "postgres-db-config-ou5y"
-  namespace: "default"
-  labels:
-    database: "postgres-db"
-data:
-  POSTGRES_USER: "fastapi-postgres"
-  POSTGRES_PASSWORD: "fastapipostgres79"
-  POSTGRES_DB: "telemetry_db"
----
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
@@ -31,22 +18,31 @@ spec:
       containers:
       - name: "postgres-1"
         image: "postgres:16"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
         env:
-        - name: "POSTGRES_USER"
+        - name: POSTGRES_USER
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_USER"
-              name: "postgres-db-config-ou5y"
-        - name: "POSTGRES_PASSWORD"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_PASSWORD"
-              name: "postgres-db-config-ou5y"
-        - name: "POSTGRES_DB"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+
+        - name: POSTGRES_DB
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_DB"
-              name: "postgres-db-config-ou5y"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
       nodeSelector:
         cloud.google.com/compute-class: "autopilot"
 ---

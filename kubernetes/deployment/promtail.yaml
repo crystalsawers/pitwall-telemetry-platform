@@ -49,10 +49,11 @@ spec:
 
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 50m
+              memory: 64Mi
             limits:
-              ephemeral-storage: 1Gi
+              cpu: 100m
+              memory: 128Mi
 
           volumeMounts:
             - name: promtail-config

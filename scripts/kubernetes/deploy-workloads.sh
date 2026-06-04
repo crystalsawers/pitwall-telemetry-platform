@@ -72,19 +72,6 @@ echo "Deploying all workloads to Kubernetes cluster..."
 # Deployment 1: PostgreSQL
 echo "Deploying PostgreSQL..."
 cat <<EOF > $K8S_DIR/postgres-db.yaml
----
-apiVersion: "v1"
-kind: "ConfigMap"
-metadata:
-  name: "postgres-db-config-ou5y"
-  namespace: "default"
-  labels:
-    database: "postgres-db"
-data:
-  POSTGRES_USER: "fastapi-postgres"
-  POSTGRES_PASSWORD: "fastapipostgres79"
-  POSTGRES_DB: "telemetry_db"
----
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
@@ -105,22 +92,31 @@ spec:
       containers:
       - name: "postgres-1"
         image: "postgres:16"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
         env:
-        - name: "POSTGRES_USER"
+        - name: POSTGRES_USER
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_USER"
-              name: "postgres-db-config-ou5y"
-        - name: "POSTGRES_PASSWORD"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_PASSWORD"
-              name: "postgres-db-config-ou5y"
-        - name: "POSTGRES_DB"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+
+        - name: POSTGRES_DB
           valueFrom:
-            configMapKeyRef:
-              key: "POSTGRES_DB"
-              name: "postgres-db-config-ou5y"
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
       nodeSelector:
         cloud.google.com/compute-class: "autopilot"
 ---
@@ -163,8 +159,72 @@ spec:
   type: "ClusterIP"
 EOF
 
-# Deployment 2: FastAPI
-echo "Deploying FastAPI..."
+# Apply PostgreSQL deployment and schema setup
+kubectl apply -f $K8S_DIR/postgres-db.yaml
+
+echo "Waiting for Postgres to become ready..."
+
+kubectl wait --for=condition=ready pod -l database=postgres-db --timeout=180s
+
+# -----------------------------------------
+# RUN POSTGRES INIT JOB (SCHEMA MIGRATION)
+# -----------------------------------------
+echo "Creating Postgres schema job..."
+
+cat <<EOF > $K8S_DIR/postgres-init-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init-schema
+  namespace: default
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: init-schema
+        image: postgres:16
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        command:
+        - bash
+        - -c
+        - |
+          echo "Waiting for Postgres..."
+          until pg_isready -h postgres-db-service -p 5432; do
+            sleep 2
+          done
+
+          echo "Creating schema..."
+          psql -h postgres-db-service -U fastapi-postgres -d telemetry_db <<EOF_SQL
+          CREATE TABLE IF NOT EXISTS telemetry (
+              id SERIAL PRIMARY KEY,
+              driver_number INT,
+              driver_name TEXT,
+              team_name TEXT,
+              lap_number INT,
+              lap_time DOUBLE PRECISION,
+              position INT,
+              data JSONB
+          );
+          EOF_SQL
+
+          echo "Schema ready."
+EOF
+
+kubectl apply -f $K8S_DIR/postgres-init-job.yaml
+kubectl wait --for=condition=complete job/postgres-init-schema --timeout=180s
+
+echo "Postgres schema initialized."
+
+
+# Deployment 2: FastAPI Application
+echo "Deploying FastAPI application..."
 cat <<EOF > $K8S_DIR/fastapi-app.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -197,7 +257,13 @@ spec:
       containers:
       - name: f1-telemetry-api-sha256-1
         image: australia-southeast1-docker.pkg.dev/project-1f40dd62-739c-473a-b20/f1-stack/f1-telemetry-api@sha256:dc951b017678db9c22071bcf294eed4b133f2d156e347b99a4d7cf5d643b5062
-
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: POSTGRES_USER
           valueFrom:
@@ -331,10 +397,11 @@ spec:
 
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 300m
+              memory: 1Gi
             limits:
-              ephemeral-storage: 1Gi
+              cpu: 800m
+              memory: 2Gi
 
           volumeMounts:
             - name: prometheus-config
@@ -436,10 +503,11 @@ spec:
 
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 200m
+              memory: 512Mi
             limits:
-              ephemeral-storage: 1Gi
+              cpu: 500m
+              memory: 1Gi
 
           volumeMounts:
             - name: loki-config
@@ -524,10 +592,11 @@ spec:
 
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 50m
+              memory: 64Mi
             limits:
-              ephemeral-storage: 1Gi
+              cpu: 100m
+              memory: 128Mi
 
           volumeMounts:
             - name: promtail-config
@@ -2576,11 +2645,11 @@ spec:
 
         resources:
           requests:
-            cpu: 250m
-            memory: 512Mi
+            cpu: 100m
+            memory: 128Mi
           limits:
-            cpu: 500m
-            memory: 1Gi
+            cpu: 300m
+            memory: 256Mi
 
         volumeMounts:
         - name: grafana-datasources

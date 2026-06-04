@@ -29,7 +29,13 @@ spec:
       containers:
       - name: f1-telemetry-api-sha256-1
         image: australia-southeast1-docker.pkg.dev/project-1f40dd62-739c-473a-b20/f1-stack/f1-telemetry-api@sha256:dc951b017678db9c22071bcf294eed4b133f2d156e347b99a4d7cf5d643b5062
-
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: POSTGRES_USER
           valueFrom:
@@ -62,7 +68,7 @@ spec:
               key: DB_PORT
 
         - name: DATABASE_URL
-          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)"
+          value: "postgresql://\$(POSTGRES_USER):\$(POSTGRES_PASSWORD)@\$(DB_HOST):\$(DB_PORT)/\$(POSTGRES_DB)"
 
       nodeSelector:
         cloud.google.com/compute-class: autopilot

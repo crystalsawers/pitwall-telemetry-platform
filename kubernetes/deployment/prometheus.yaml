@@ -52,10 +52,11 @@ spec:
 
           resources:
             requests:
-              cpu: 500m
-              memory: 2Gi
+              cpu: 300m
+              memory: 1Gi
             limits:
-              ephemeral-storage: 1Gi
+              cpu: 800m
+              memory: 2Gi
 
           volumeMounts:
             - name: prometheus-config
