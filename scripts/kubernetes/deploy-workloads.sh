@@ -432,187 +432,8 @@ spec:
   type: ClusterIP
 EOF
 
-# Deployment 4: Loki 
-echo "Deploying Loki..."
-cat <<EOF > $K8S_DIR/loki.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: loki-config
-  namespace: default
-data:
-  loki.yml: |
-    auth_enabled: false
 
-    server:
-      http_listen_port: 3100
-
-    common:
-      path_prefix: /tmp/loki
-      replication_factor: 1
-      ring:
-        kvstore:
-          store: inmemory
-      storage:
-        filesystem:
-          chunks_directory: /tmp/loki/chunks
-          rules_directory: /tmp/loki/rules
-
-    schema_config:
-      configs:
-        - from: 2024-01-01
-          store: tsdb
-          object_store: filesystem
-          schema: v13
-          index:
-            prefix: index_
-            period: 24h
-
-    storage_config:
-      filesystem:
-        directory: /tmp/loki
-
-    limits_config:
-      allow_structured_metadata: false
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: loki-logs
-  namespace: default
-  labels:
-    monitoring: loki-logs
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      monitoring: loki-logs
-  template:
-    metadata:
-      labels:
-        monitoring: loki-logs
-    spec:
-      containers:
-        - name: loki
-          image: grafana/loki:3.0.0
-          args:
-            - "-config.file=/etc/loki/loki.yml"
-          ports:
-            - containerPort: 3100
-
-          resources:
-            requests:
-              cpu: 200m
-              memory: 512Mi
-            limits:
-              cpu: 500m
-              memory: 1Gi
-
-          volumeMounts:
-            - name: loki-config
-              mountPath: /etc/loki/loki.yml
-              subPath: loki.yml
-
-      volumes:
-        - name: loki-config
-          configMap:
-            name: loki-config
-
-      nodeSelector:
-        cloud.google.com/compute-class: autopilot
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: loki-logs
-  namespace: default
-spec:
-  selector:
-    monitoring: loki-logs
-  ports:
-    - name: http
-      port: 3100
-      targetPort: 3100
-  type: ClusterIP
-EOF
-
-# Deployment 5: Promtail
-echo "Deploying Promtail..."
-cat <<EOF > $K8S_DIR/promtail.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: promtail-config
-  namespace: default
-data:
-  config.yml: |
-    server:
-      http_listen_port: 9080
-
-    positions:
-      filename: /tmp/positions.yaml
-
-    clients:
-      - url: http://loki-logs:3100/loki/api/v1/push
-
-    scrape_configs:
-      - job_name: containers
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: varlogs
-              __path__: /var/log/*.log
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: promtail
-  namespace: default
-  labels:
-    monitoring: promtail
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      monitoring: promtail
-  template:
-    metadata:
-      labels:
-        monitoring: promtail
-    spec:
-      containers:
-        - name: promtail
-          image: grafana/promtail:3.0.0
-          args:
-            - "-config.file=/etc/promtail/config.yml"
-
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 100m
-              memory: 128Mi
-
-          volumeMounts:
-            - name: promtail-config
-              mountPath: /etc/promtail/config.yml
-              subPath: config.yml
-
-      volumes:
-        - name: promtail-config
-          configMap:
-            name: promtail-config
-
-      nodeSelector:
-        cloud.google.com/compute-class: autopilot
-EOF
-
-# Deployment 6: Grafana
+# Deployment 4: Grafana
 echo "Deploying Grafana..."
 cat <<EOF > $K8S_DIR/grafana.yaml
 apiVersion: v1
@@ -632,10 +453,9 @@ data:
         isDefault: true
         editable: false
 
-      - name: Loki
-        type: loki
+      - name: Google Cloud Monitoring
+        type: stackdriver
         access: proxy
-        url: http://loki-logs:3100
         editable: false
 
       - name: Infinity
@@ -2180,21 +2000,21 @@ data:
         "targets": [
           {
             "datasource": {
-              "type": "loki"
+              "type": "stackdriver"
             },
             "direction": "backward",
             "editorMode": "code",
-            "expr": "{service_name=~\".+\"}",
+            "expr": "resource.type=\"k8s_container\"",
             "queryType": "range",
             "refId": "A"
           }
         ],
-        "title": "Loki Logs",
+        "title": "Google Logging Logs",
         "type": "logs"
       },
       {
         "datasource": {
-          "type": "loki"
+          "type": "stackdriver"
         },
         "gridPos": {
           "h": 8,
@@ -2221,16 +2041,16 @@ data:
         "targets": [
           {
             "datasource": {
-              "type": "loki"
+              "type": "stackdriver"
             },
             "direction": "backward",
             "editorMode": "code",
-            "expr": "{job=\"varlogs\"} |~ \"(error|warn)\"",
+            "expr": "resource.type=\"k8s_container\" AND severity>=WARNING",
             "queryType": "range",
             "refId": "A"
           }
         ],
-        "title": "Loki Log Errors & Warnings",
+        "title": "Google Logging Errors & Warnings",
         "type": "logs"
       },
       {
@@ -2641,7 +2461,7 @@ spec:
               key: GF_SECURITY_ADMIN_PASSWORD
 
         - name: GF_INSTALL_PLUGINS
-          value: yesoreyeram-infinity-datasource
+          value:  yesoreyeram-infinity-datasource,grafana-googlecloud-monitoring-datasource
 
         resources:
           requests:
