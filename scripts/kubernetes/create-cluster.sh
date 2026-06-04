@@ -52,7 +52,8 @@ gcloud beta container clusters create $CLUSTER_NAME \
     --enable-shielded-nodes \
     --shielded-integrity-monitoring \
     --no-shielded-secure-boot \
-    --node-locations=$ZONE
+    --node-locations=$ZONE \
+    --scopes="https://www.googleapis.com/auth/cloud-platform"
 
 # Stop script if cluster creation failed
 if [ $? -ne 0 ]; then

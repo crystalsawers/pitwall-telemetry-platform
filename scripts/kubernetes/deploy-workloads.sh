@@ -8,9 +8,13 @@ set -euo pipefail
 # VARIABLES
 K8S_DIR="k8s" # This is the folder all Kubernetes manifests will be generated
 PROJECT_ID=$(gcloud config get-value project)
+NODE_POOL="default-pool"
+CLUSTER_NAME="f1-automated-cluster"
+ZONE="australia-southeast1-a"
+SCOPES="https://www.googleapis.com/auth/cloud-platform"
 
 gcloud config set project $PROJECT_ID
-gcloud container clusters get-credentials f1-automated-cluster --zone australia-southeast1-a
+gcloud container clusters get-credentials "${CLUSTER_NAME}" --zone "${ZONE}"
 
 echo "Creating manifests directory..."
 mkdir -p $K8S_DIR
@@ -453,16 +457,23 @@ data:
         isDefault: true
         editable: false
 
-      - name: Google Cloud Monitoring
+      - name: Google Cloud Logging
         type: stackdriver
         access: proxy
+        isDefault: false
         editable: false
+        jsonData:
+          defaultProject: ${PROJECT_ID}
+          tokenUri: https://oauth2.googleapis.com/token
+          authenticationType: gce
+          clientEmail: ""
+          privateKey: ""
+          impersonate: false
 
       - name: Infinity
         type: yesoreyeram-infinity-datasource
         access: proxy
         editable: false
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -2424,6 +2435,15 @@ data:
     "id": 1802620253843456
     }
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: grafana-gcp@{PROJECT_ID}.iam.gserviceaccount.com
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2441,6 +2461,8 @@ spec:
       labels:
         monitoring: grafana
     spec:
+      serviceAccountName: grafana
+
       containers:
       - name: grafana
         image: grafana/grafana
@@ -2461,7 +2483,7 @@ spec:
               key: GF_SECURITY_ADMIN_PASSWORD
 
         - name: GF_INSTALL_PLUGINS
-          value:  yesoreyeram-infinity-datasource,grafana-googlecloud-monitoring-datasource
+          value: yesoreyeram-infinity-datasource
 
         resources:
           requests:
@@ -2517,7 +2539,24 @@ EOF
 # -------------------------------------------
 # APPLY ALL MANIFESTS
 # -------------------------------------------
+
+echo "Fixing node pool scopes (required for Cloud Logging)..."
+
+gcloud container node-pools update "${NODE_POOL}" \
+  --cluster "${CLUSTER_NAME}" \
+  --zone "${ZONE}" \
+  --scopes="${SCOPES}"
+
 kubectl apply -f $K8S_DIR
+echo "Applying IAM permissions for Grafana logging access..."
+
+PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
+NODE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${NODE_SA}" \
+  --role="roles/logging.viewer"
+
 echo "All workloads deployed successfully."
 
 echo "Waiting for deployments..."

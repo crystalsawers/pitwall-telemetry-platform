@@ -4,9 +4,9 @@ set -euo pipefail
 
 echo "GKE / Kubernetes cleanup starting..."
 
-
-# VARIABLES
-
+# ---------------------------------------
+# Config
+# ---------------------------------------
 PROJECT_ID=$(gcloud config get-value project)
 REGION="australia-southeast1"
 ZONE="australia-southeast1-a"
@@ -14,6 +14,10 @@ CLUSTER_NAME="f1-automated-cluster"
 K8S_DIR="k8s"
 
 echo "Project: $PROJECT_ID"
+
+# ---------------------------------------
+# Set project
+# ---------------------------------------
 gcloud config set project "$PROJECT_ID"
 
 # ---------------------------------------
@@ -32,6 +36,8 @@ if [ -d "$K8S_DIR" ]; then
   echo "Deleting manifests from $K8S_DIR"
   kubectl delete -f "$K8S_DIR" --ignore-not-found=true || true
 fi
+
+rm -rf "$K8S_DIR"
 
 # ---------------------------------------
 # Clean in-cluster resources

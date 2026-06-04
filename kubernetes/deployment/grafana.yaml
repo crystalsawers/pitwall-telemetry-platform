@@ -15,10 +15,18 @@ data:
         isDefault: true
         editable: false
 
-      - name: Google Cloud Monitoring
+      - name: Google Cloud Logging
         type: stackdriver
         access: proxy
+        isDefault: false
         editable: false
+        jsonData:
+          defaultProject: ${PROJECT_ID}
+          tokenUri: https://oauth2.googleapis.com/token
+          authenticationType: gce
+          clientEmail: ""
+          privateKey: ""
+          impersonate: false
 
       - name: Infinity
         type: yesoreyeram-infinity-datasource
@@ -1986,6 +1994,15 @@ data:
     "id": 1802620253843456
     }
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: grafana-gcp@{PROJECT_ID}.iam.gserviceaccount.com
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2003,6 +2020,8 @@ spec:
       labels:
         monitoring: grafana
     spec:
+      serviceAccountName: grafana
+
       containers:
       - name: grafana
         image: grafana/grafana
@@ -2023,7 +2042,7 @@ spec:
               key: GF_SECURITY_ADMIN_PASSWORD
 
         - name: GF_INSTALL_PLUGINS
-          value:  yesoreyeram-infinity-datasource,grafana-googlecloud-monitoring-datasource
+          value: yesoreyeram-infinity-datasource
 
         resources:
           requests:
