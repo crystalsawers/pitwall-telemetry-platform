@@ -165,9 +165,9 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ### Part 3 - CI/CD, Container Orchestration & Infrastructure (Phase 6-8)
 
-📘 Docs: (coming soon)
+📘 Docs: [/docs/phase 6-7-8.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%206-7-8.md)
 
-📝 Blog: (coming soon)
+📝 Blog: [The Art of Google Cloud (Part 3)](https://loglapandover.co.nz/projects/devops/8RA0vlrnQM9lmk8gUg8t)
 
 #### Phase 6 - CI/CD Automation
 
@@ -188,82 +188,72 @@ This project is broken down into several phases, documented as a blog series. Th
 
 
 
-#### Phase 8 - Kubernetes & Terraform
+#### Phase 8 - Kubernetes 
 
 * Google Kubernetes Engine (GKE) introduction
 * Kubernetes deployments, services, and scaling concepts
 * Transition from container builds → orchestrated cluster deployment
-* Terraform-based infrastructure provisioning
-* Reusable environment definitions
-* Fully reproducible cloud setups
-* Standardised infrastructure deployment workflows
+* Automation with Deployments, Config Maps, Jobs, and Workloads
 
 ---
 
-### Part 4 - Reliability & Advanced Security (Phase 9-10)
+### Part 4 - Independent Google Cloud Experiments (Phase 9-11)
 
 📘 Docs: (coming soon)
 
 📝 Blog: (coming soon)
 
+#### Phase 9 - AI Agent Platform
 
+* Standalone AI agent experimentation (not tied to production systems)
+* Natural language interaction capabilities
+* Reasoning workflows and chain-of-thought patterns
+* Tool use and function calling exploration
+* Google Cloud AI/ML APIs for agent augmentation
+* Independent test scenarios for agent behavior and response quality
+* Agent Platform testing for conversational AI workflows
 
-#### Phase 9 - Reliability Engineering & High Availability
+#### Phase 10 - BigQuery Data Exploration
 
-* Load balancing strategies
-* Rolling updates and deployment strategies
-* Autoscaling concepts
-* Health checks and self-healing systems
-* Backup and disaster recovery testing
+* BigQuery setup and configuration for learning purposes
+* Sample dataset loading and exploration
+* Standard SQL querying for analytical workflows
+* Dataset handling patterns (partitioning, clustering)
+* Query performance basics and cost awareness
+* Data export and visualization connections (Looker Studio, Python)
 
+#### Phase 11 - Google Cloud Experiments
 
-
-#### Phase 10 - Advanced Security & DevSecOps
-
-* Container vulnerability scanning
-* IAM hardening practices
-* Workload Identity concepts
-* Network policy enforcement
-* Secret rotation strategies
-* CI/CD security integration
+* Google Maps Platform API exploration (geocoding, routes, places)
+* Additional API experimentation (Vision API, Translation API, etc.)
+* Independent testing scenarios using sample/test data only
+* Documentation of findings and learning outcomes
 
 ---
 
-### Part 5 - Event-Driven Systems & Data Engineering (Phase 11+)
+### Part 5 - Infrastructure as Code (Phase 12)
 
 📘 Docs: (coming soon)
 
 📝 Blog: (coming soon)
 
+#### Phase 12 - Terraform
 
-#### Phase 11 - Event-Driven Telemetry Systems
-
-* Pub/Sub-based architecture
-* Asynchronous processing pipelines
-* Queue-based worker systems
-* Real-time telemetry ingestion
-
-
-#### Phase 12 - Data Analytics & Telemetry Platforms
-
-* BigQuery for telemetry storage
-* ETL pipelines for data processing
-* Historical performance analysis
-* Analytics dashboards
-
-
-#### Phase 13 - Site Reliability Engineering & Operations
-
-* Alerting systems and SLIs/SLOs
-* Incident response workflows
-* Synthetic monitoring
-* Chaos engineering experiments
-* Operational runbooks
+* Terraform project structure and state management
+* Virtual Machine (VM) provisioning on Compute Engine
+* Google Kubernetes Engine (GKE) cluster deployment
+* Cloud Run service configuration and deployment
+* Cloud SQL instance provisioning (PostgreSQL/MySQL)
+* IAM roles, policies, and service accounts
+* VPC networking, subnets, firewall rules
+* Cloud Storage buckets for Terraform state backends
+* Full environment reproducibility across dev/staging/prod
+* Modular configuration for reusable infrastructure components
 
 ---
 
 ## Current Status
 
-**Phase 7:**  Cloud Run and Cloud SQL, DONE
+**Phase 8:**  Kubernetes, DONE
 
-**Next Phase:** Phase8 - Kubernetes
+**Next Phase:** Phase 9 - AI Agent Platform
