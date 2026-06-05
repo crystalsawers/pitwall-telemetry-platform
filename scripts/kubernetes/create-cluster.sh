@@ -13,6 +13,7 @@ ZONE="australia-southeast1-a"
 MACHINE_TYPE="e2-medium"
 DISK_SIZE="30"
 NUM_NODES="3"
+NODE_POOL="default-pool"
 
 
 # Create Cluster
@@ -53,7 +54,8 @@ gcloud beta container clusters create $CLUSTER_NAME \
     --shielded-integrity-monitoring \
     --no-shielded-secure-boot \
     --node-locations=$ZONE \
-    --scopes="https://www.googleapis.com/auth/cloud-platform"
+    --scopes="https://www.googleapis.com/auth/cloud-platform" \
+    --workload-pool=${PROJECT_ID}.svc.id.goog
 
 # Stop script if cluster creation failed
 if [ $? -ne 0 ]; then
@@ -65,6 +67,14 @@ fi
 gcloud container clusters get-credentials $CLUSTER_NAME \
     --zone=$ZONE \
     --project=$PROJECT_ID
+
+
+# Verify node pool scopes
+gcloud container node-pools describe "${NODE_POOL}" \
+  --cluster "${CLUSTER_NAME}" \
+  --zone "${ZONE}" \
+  --format="value(config.oauthScopes)"
+
 
 # Verify cluster
 kubectl get nodes

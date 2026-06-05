@@ -6,14 +6,16 @@
 set -euo pipefail
 
 # VARIABLES
-K8S_DIR="k8s" # This is the folder all Kubernetes manifests will be generated
+K8S_DIR="k8s"
 PROJECT_ID=$(gcloud config get-value project)
-NODE_POOL="default-pool"
 CLUSTER_NAME="f1-automated-cluster"
 ZONE="australia-southeast1-a"
-SCOPES="https://www.googleapis.com/auth/cloud-platform"
 
+#-----------------------------------------
+# PRE-DEPLOYMENT CHECKS
+#-----------------------------------------
 gcloud config set project $PROJECT_ID
+echo "Project: $PROJECT_ID"
 gcloud container clusters get-credentials "${CLUSTER_NAME}" --zone "${ZONE}"
 
 echo "Creating manifests directory..."
@@ -456,24 +458,12 @@ data:
         url: http://prometheus:9090
         isDefault: true
         editable: false
-
-      - name: Google Cloud Logging
-        type: stackdriver
-        access: proxy
-        isDefault: false
-        editable: false
-        jsonData:
-          defaultProject: ${PROJECT_ID}
-          tokenUri: https://oauth2.googleapis.com/token
-          authenticationType: gce
-          clientEmail: ""
-          privateKey: ""
-          impersonate: false
-
+        
       - name: Infinity
         type: yesoreyeram-infinity-datasource
         access: proxy
         editable: false
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -487,7 +477,7 @@ data:
     providers:
       - name: "f1-dashboards"
         orgId: 1
-        folder: "F1"
+        folder: "F1 Dashboards"
         type: file
         disableDeletion: false
         editable: true
@@ -1983,89 +1973,6 @@ data:
       },
       {
         "datasource": {
-          "type": "loki"
-
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 11,
-          "x": 0,
-          "y": 14
-        },
-        "id": 5,
-        "options": {
-          "dedupStrategy": "none",
-          "enableInfiniteScrolling": false,
-          "enableLogDetails": true,
-          "prettifyLogMessage": true,
-          "showControls": false,
-          "showFieldSelector": false,
-          "showLevel": true,
-          "showTime": false,
-          "sortOrder": "Descending",
-          "timestampResolution": "ms",
-          "unwrappedColumns": false,
-          "wrapLogMessage": false
-        },
-        "pluginVersion": "13.0.1+security-01",
-        "targets": [
-          {
-            "datasource": {
-              "type": "stackdriver"
-            },
-            "direction": "backward",
-            "editorMode": "code",
-            "expr": "resource.type=\"k8s_container\"",
-            "queryType": "range",
-            "refId": "A"
-          }
-        ],
-        "title": "Google Logging Logs",
-        "type": "logs"
-      },
-      {
-        "datasource": {
-          "type": "stackdriver"
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 13,
-          "x": 11,
-          "y": 14
-        },
-        "id": 6,
-        "options": {
-          "dedupStrategy": "none",
-          "enableInfiniteScrolling": false,
-          "enableLogDetails": true,
-          "prettifyLogMessage": true,
-          "showControls": false,
-          "showFieldSelector": false,
-          "showLevel": true,
-          "showTime": false,
-          "sortOrder": "Descending",
-          "timestampResolution": "ms",
-          "unwrappedColumns": false,
-          "wrapLogMessage": false
-        },
-        "pluginVersion": "13.0.1+security-01",
-        "targets": [
-          {
-            "datasource": {
-              "type": "stackdriver"
-            },
-            "direction": "backward",
-            "editorMode": "code",
-            "expr": "resource.type=\"k8s_container\" AND severity>=WARNING",
-            "queryType": "range",
-            "refId": "A"
-          }
-        ],
-        "title": "Google Logging Errors & Warnings",
-        "type": "logs"
-      },
-      {
-        "datasource": {
           "type": "prometheus"
         },
         "fieldConfig": {
@@ -2440,8 +2347,6 @@ kind: ServiceAccount
 metadata:
   name: grafana
   namespace: default
-  annotations:
-    iam.gke.io/gcp-service-account: grafana-gcp@{PROJECT_ID}.iam.gserviceaccount.com
 
 ---
 apiVersion: apps/v1
@@ -2462,6 +2367,7 @@ spec:
         monitoring: grafana
     spec:
       serviceAccountName: grafana
+      automountServiceAccountToken: false
 
       containers:
       - name: grafana
@@ -2540,22 +2446,7 @@ EOF
 # APPLY ALL MANIFESTS
 # -------------------------------------------
 
-echo "Fixing node pool scopes (required for Cloud Logging)..."
-
-gcloud container node-pools update "${NODE_POOL}" \
-  --cluster "${CLUSTER_NAME}" \
-  --zone "${ZONE}" \
-  --scopes="${SCOPES}"
-
 kubectl apply -f $K8S_DIR
-echo "Applying IAM permissions for Grafana logging access..."
-
-PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
-NODE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-
-gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-  --member="serviceAccount:${NODE_SA}" \
-  --role="roles/logging.viewer"
 
 echo "All workloads deployed successfully."
 
