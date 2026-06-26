@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/548bac49-26e6-4835-acce-d75e8cf10066
+
 # The Art of Google Cloud (Part 4): Experimenting the AI Agent Platform and other APIs
 
 *Project Timeframe: 9 May 2026 – 8 August 2026*
@@ -110,12 +114,10 @@ _- Details of the Grand Prix like location, number of laps, date, race time in t
 
 This one took a bit longer to build, it also took about 2 minutes to complete, and the data doesn't match up to the actual one, it's basically mock data.
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1%20telemetry%20app%20AI%201.mp4?alt=media&token=336988f8-220f-4cc8-bb20-4ba5712172cb" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
+
+
+https://github.com/user-attachments/assets/bc85a9ba-7ef8-4b88-b87a-4665b266bd47
+
 
 I did decide to prompt some improvements. For the dashboard I also wanted a way to convert the local time and date to my local time zone and toggle it with the track's local timezone. I also wanted in the main dash on who won the race, and who was on the podium, and the top 3 in drivers championship name to be changed from "Drivers Top 3", to "Drivers Championship". For race results page I want a column on how many laps each driver has completed.
 
