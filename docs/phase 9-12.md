@@ -121,14 +121,11 @@ https://github.com/user-attachments/assets/bc85a9ba-7ef8-4b88-b87a-4665b266bd47
 
 I did decide to prompt some improvements. For the dashboard I also wanted a way to convert the local time and date to my local time zone and toggle it with the track's local timezone. I also wanted in the main dash on who won the race, and who was on the podium, and the top 3 in drivers championship name to be changed from "Drivers Top 3", to "Drivers Championship". For race results page I want a column on how many laps each driver has completed.
 
-Prompt #2 (Improvement): _"Dashboard needs changes: A feature to toggle Local Track Time and Data to a timezone of choice (e.g. NZST), the race winner of that Grand Prix along with the podium, and the top 3 in drivers chmpaionship name to be changed from "Drivers Top 3", to "Drivers Championship". For race results page I want a column on how many laps each driver has completed."_.
+Prompt #2 (Improvement): _"Dashboard needs changes: A feature to toggle Local Track Time and Data to a timezone of choice (e.g. NZST), the race winner of that Grand Prix along with the podium, and the top 3 in drivers championship name to be changed from "Drivers Top 3", to "Drivers Championship". For race results page I want a column on how many laps each driver has completed."_.
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1%20telemetry%20app%20AI%202.mp4?alt=media&token=752f3a9a-96fc-4e20-b387-8cbbf40b831d" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
+
+https://github.com/user-attachments/assets/6ec48e52-0069-4bca-9e95-9813dfe4bb8c
+
 
 The improvement did come up with a slight coding error occuring but it was a minor one that was an easy auto-fix and the changes applied. 
 
@@ -137,23 +134,21 @@ Now for one last prompt for tweaking. You may notice that there is a "System Con
 
 Prompt #3: _"Remove the "System Config" at the bottom and it does nothing to add to the system. In the Live Telemetry page, add a feature that lets me pick any driver for me to track."_
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1%20telemetry%20app%20AI%203.mp4?alt=media&token=fff3fe64-e3f1-47f7-922a-f56eaf130865" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
+
+https://github.com/user-attachments/assets/ac8df83b-e231-4cd2-8f6d-feee6ba6d724
+
+
 
 As you can see, the Live Telemetry still isn't perfect because it's going off mock data that seems to apply the same to all drivers, so there's no variety on tyres, or things like RPM, throttle, brakes, or speed.
 
 Final Prompt: _"Add some variety for each driver on tyres, RPM, throttle, brakes, and speed, while maintaining the simulated "live" feel."_
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2FF1%20telemetry%20app%20AI%204.mp4?alt=media&token=46dcc0d0-3049-4f0a-b42c-dcd2752eeea2" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
+
+
+
+https://github.com/user-attachments/assets/4e859c7a-eea9-41a7-80b7-4048c8cb9932
+
+
 
 It was successful. I clicked on a few drivers and there was indeed variety, and the most realistic thing about it is that AI has replicated McLaren putting on a terrible tyre strategy on Lando Norris.
 
@@ -187,26 +182,12 @@ The result comes up with this photo above. The simulated reflection of the image
 
 Up next is a **text-to-video** prompt, where I prompt something ridiculous: _"Visualise a psychedelic acid trip, where every colour is a trippy illusion, and the 2D fruits fall from the sky as rain"_.
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fai-slop-text-to-video.mp4?alt=media&token=8884ef60-b6f0-44d0-bff1-22dd61a598aa" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
-
+Because this video was too big to embed in here, click [here](https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fai-slop-text-to-video.mp4?alt=media&token=8884ef60-b6f0-44d0-bff1-22dd61a598aa) for the AI slop video. Or click on my blog post to view it.
 It generates an 8-second video without sound of whatever this is. What I was expecting was what's normally portrayed in the media of what an acid trip looks and feels like. Don't ask me why this idea came into my head, the point of this idea was that I wanted to show that this really is useless slop people are wasting tokens on. There's also options to input images to video as well, but I only really had a go at the examples that Google had. 
 
 **Speech** is another feature of the AI slop genre. There's a few different models you can use here and you can customise the style of speech delivery in some of them. You can also choose the accent/language and gender of the voice. My prompt was just some made-up crap brought to you by my own brain: _"This is going to change everything. The digital sludge that humans create, will become a world full of wasteland."_.
 
-<br>
-
-<audio controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fai-slop-speech.mp3?alt=media&token=6b9ae562-83f2-4640-9909-b6060afbfb87" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
-
-<br>
-
+[ai-slop-speech.mp3](https://github.com/user-attachments/files/29366325/ai-slop-speech.mp3)
 
 Finally, there is the **Music** creation section. As someone who knows a little bit of theory and song structure, I can tell you that in most songs, it uses some kind of common musical pattern. First I will go over one of the **Melodic** patterns, there is a famous **3-chord progression** (although there's also other ones [here](https://en.wikipedia.org/wiki/Chord_progression)), that's prominently used in 12-bar blues. A chord is the sound of more than one musical note, in most cases it's 3 or 4 notes. But the chords are structured in thirds, for example, the chord of C major would have C as the base note, E as the third note of the scale, and G as the fifth note. 
 
@@ -236,13 +217,9 @@ Here's the issue. It **failed to generate any music** with that specific prompt.
 
 "_Create a hit song about a person's love for cheesecake._"
 
-<br>
-<audio controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fcheesecake-swirl.wav?alt=media&token=f8d380d9-4188-4346-aa74-aeca696ffa50" type="audio/wav">
-  Your browser does not support the audio element.
-</audio>
 
-<br>
+[cheesecake-swirl.wav](https://github.com/user-attachments/files/29366293/cheesecake-swirl.wav)
+
 
 Here's the song it put out. This is an absolutely terrible song it's created by the way, so this is the definitive soundtrack to AI slop, if you will. The lyrics aren't exactly inspiring either, but then again, I did do an unserious prompt. This is proof that a lot of the music-based AI models only really train it off of generic licensed music to avoid copyright issues, and it's been speculated as such on a few Reddit threads with this model specifically. I am glad though that copyright laws exist though for AI, because it can easily steal signature sounds off artists, and there'd be a million lawsuits coming their way if they trained it off of more famous songs.
 
@@ -250,13 +227,9 @@ Here's the song it put out. This is an absolutely terrible song it's created by 
 
 _"Create a metal song about cheesecake."_
 
-<br>
-<audio controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fmetal-cheesecake.wav?alt=media&token=7977c648-b90f-4a38-8ea3-762cf2d2f17f" type="audio/wav">
-  Your browser does not support the audio element.
-</audio>
 
-<br>
+[metal-cheesecake.wav](https://github.com/user-attachments/files/29366298/metal-cheesecake.wav)
+
 
 What is interesting though, is that it can do more than one genre, even though it can't understand the basic structure of music. This one is at least a bit more listenable, but it still lacks the quality and the soul of music being made by humans.
 
@@ -339,13 +312,11 @@ Now I have two more tables created in this dataset, ready to query.
 Now we are going to test out some more queries, rather than just the "Select" and "Insert Into" queries, I will try some more queries within the SQL language.
 
 The full SQL script is under the [BigQuery folder](https://github.com/crystalsawers/pitwall-telemetry-platform/tree/main/BigQuery) in the repo, with the filename of ["10.3 BigQueries.sql"](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/BigQuery/10.3%20BigQueries.sql). The following video is only showing the results that came from this script:
+[ai-slop-speech.mp3](https://github.com/user-attachments/files/29366322/ai-slop-speech.mp3)
 
-<br>
-<video controls>
-  <source src="https://firebasestorage.googleapis.com/v0/b/crystal-personalblog.appspot.com/o/images%2Fbigquery-queries.mp4?alt=media&token=f58e05fb-78e4-43c4-ad82-d4efa0927a75" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<br>
+
+https://github.com/user-attachments/assets/425e4893-b1cf-4221-958d-af83766dd814
+
 
 
 ### 10.4 – SQL Scripting
