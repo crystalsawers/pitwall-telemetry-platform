@@ -68,6 +68,7 @@ Key constraints include:
 - Strict control over cluster sizing and uptime
 - Storage and logging growth management
 - Avoiding unnecessary always-on services
+- Using only Google-owned AI models in the Agent Platform (e.g. Gemini)
 
 To manage this:
 - Resources are kept minimal and modular
@@ -197,11 +198,11 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ---
 
-### Part 4 - Independent Google Cloud Experiments (Phase 9-11)
+### Part 4 - Independent Google Cloud Experiments (Phase 9-12)
 
-📘 Docs: (coming soon)
+📘 Docs: [/docs/phase 9-12.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%209-12.md)
 
-📝 Blog: (coming soon)
+📝 Blog: [The Art of Google Cloud (Part 4)]()
 
 #### Phase 9 - AI Agent Platform
 
@@ -222,22 +223,25 @@ This project is broken down into several phases, documented as a blog series. Th
 * Query performance basics and cost awareness
 * Data export and visualization connections (Looker Studio, Python)
 
-#### Phase 11 - Google Cloud Experiments
+#### Phase 11 - Google Cloud Storage
 
-* Google Maps Platform API exploration (geocoding, routes, places)
-* Additional API experimentation (Vision API, Translation API, etc.)
-* Independent testing scenarios using sample/test data only
-* Documentation of findings and learning outcomes
+* Creating a storage bucket
+* Uploading files and folders into the bucket
+
+#### Phase 12 - Pub/Sub
+
+* Creating a Topic and Subscription
+* Configure Notifications on the subscription using the Storage Bucket from Phase 11
 
 ---
 
-### Part 5 - Infrastructure as Code (Phase 12)
+### Part 5 - Infrastructure as Code (Phase 13)
 
 📘 Docs: (coming soon)
 
 📝 Blog: (coming soon)
 
-#### Phase 12 - Terraform
+#### Phase 13 - Terraform
 
 * Terraform project structure and state management
 * Virtual Machine (VM) provisioning on Compute Engine
@@ -245,15 +249,11 @@ This project is broken down into several phases, documented as a blog series. Th
 * Cloud Run service configuration and deployment
 * Cloud SQL instance provisioning (PostgreSQL/MySQL)
 * IAM roles, policies, and service accounts
-* VPC networking, subnets, firewall rules
-* Cloud Storage buckets for Terraform state backends
-* Full environment reproducibility across dev/staging/prod
-* Modular configuration for reusable infrastructure components
 
 ---
 
 ## Current Status
 
-**Phase 8:**  Kubernetes, DONE
+**Phase 12:**  Pub/Sub, DONE
 
-**Next Phase:** Phase 9 - AI Agent Platform
+**Next Phase:** Phase 13 - Terraform
