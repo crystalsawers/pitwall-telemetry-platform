@@ -202,7 +202,7 @@ This project is broken down into several phases, documented as a blog series. Th
 
 📘 Docs: [/docs/phase 9-12.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%209-12.md)
 
-📝 Blog: [The Art of Google Cloud (Part 4)]()
+📝 Blog: [The Art of Google Cloud (Part 4)](https://loglapandover.co.nz/projects/devops/kA5uQMYizopqajwZhh2E)
 
 #### Phase 9 - AI Agent Platform
 

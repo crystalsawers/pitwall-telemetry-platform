@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/548bac49-26e6-4835-acce-d75e8cf10066
 
 *Project Timeframe: 9 May 2026 – 8 August 2026*
 
-*Link to Part 4 post:* [Part 4]()
+*Link to Part 4 post:* [Part 4](https://loglapandover.co.nz/projects/devops/kA5uQMYizopqajwZhh2E)
 
 
 **Link to previous posts**: 
@@ -28,6 +28,8 @@ This includes the **AI Agent Platform**, **BigQuery**, **Pub/Sub**, **Cloud Func
 I could've also used Firebase and Firestore here, but I already use Firebase for this very website, so that will be one that I won't explore into too much detail.
 
 The next (and probably final) part will involve the usage of Terraform in the Google Cloud context to create what I've done in the other three parts of this blog series.
+
+Also, I couldn't successfully embed everything into this document, so if you want to see the full content, head over to the blog link.
 
 ---
 ## My Love/Hate Rant and Acknowledging My Own Hypocrisy on AI
