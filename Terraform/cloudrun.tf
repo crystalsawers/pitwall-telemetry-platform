@@ -20,11 +20,29 @@ resource "google_secret_manager_secret_version" "db_password" {
 
 resource "google_sql_database_instance" "f1_db" {
   name             = "f1-telemetry-db"
-  database_version = "POSTGRES_16"
+  database_version = "POSTGRES_18"
   region           = "australia-southeast1"
 
   settings {
-    tier = "db-f1-micro"
+    tier              = "db-perf-optimized-N-2"
+    edition           = "ENTERPRISE_PLUS"
+    availability_type = "ZONAL"
+
+    disk_size = 100
+    disk_type = "PD_SSD"
+
+    ip_configuration {
+      ipv4_enabled = true
+    }
+
+    backup_configuration {
+      enabled                        = true
+      point_in_time_recovery_enabled = true
+    }
+
+    data_cache_config {
+      data_cache_enabled = true
+    }
   }
 
   deletion_protection = false
@@ -35,11 +53,13 @@ resource "google_sql_database" "f1_database" {
   instance = google_sql_database_instance.f1_db.name
 }
 
+
 resource "google_sql_user" "f1_user" {
   name     = var.db_username
   instance = google_sql_database_instance.f1_db.name
   password = google_secret_manager_secret_version.db_password.secret_data
 }
+
 
 # ------------------------------------------------------------
 # CLOUD RUN
