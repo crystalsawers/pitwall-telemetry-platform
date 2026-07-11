@@ -74,6 +74,10 @@ resource "google_cloud_run_v2_service" "f1_api" {
     containers {
       image = "australia-southeast1-docker.pkg.dev/PROJECT_ID/f1-stack/f1-telemetry-api:latest"
 
+      ports {
+        container_port = 8000 
+      }
+
       env {
         name  = "DATABASE_HOST"
         value = "/cloudsql/${google_sql_database_instance.f1_db.connection_name}"
@@ -108,6 +112,13 @@ resource "google_project_iam_member" "cloudrun_sql" {
   project = "PROJECT_ID"
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "public_access" {
+  name     = google_cloud_run_v2_service.f1_api.name
+  location = google_cloud_run_v2_service.f1_api.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 resource "google_secret_manager_secret_iam_member" "cloudrun_secret" {
