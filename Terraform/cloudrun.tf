@@ -97,6 +97,7 @@ resource "google_cloud_run_v2_service" "f1_api" {
       max_instance_count = 1
     }
   }
+  depends_on = [null_resource.trigger_first_build]
 }
 
 # ------------------------------------------------------------
@@ -113,4 +114,20 @@ resource "google_secret_manager_secret_iam_member" "cloudrun_secret" {
   secret_id = google_secret_manager_secret.db_password.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com"
+}
+
+# --------------------------------------------------------------
+# Null resource for non-existent builds
+# --------------------------------------------------------------
+
+resource "null_resource" "trigger_first_build" {
+  provisioner "local-exec" {
+    command = "gcloud builds triggers run f1-telemetry-build --branch=main --project=project-1f40dd62-739c-473a-b20"
+  }
+
+  depends_on = [
+    google_cloudbuild_trigger.f1_build
+    google_artifact_registry_repository.f1_repo,
+    google_artifact_registry_repository_iam_member.cloudbuild_writer
+  ]
 }
