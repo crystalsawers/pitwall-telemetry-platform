@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This is Version 2 of the F1 Telemetry Monitoring Stack Setup Script.
+# Basically the same script as the original, but used exclusively with the Terraform setup for the VM. 
+# It sets up the F1 Telemetry API, Prometheus, Grafana, Loki, and Promtail in a Docker environment. 
+
 # For the VM you NEED to run as root, otherwise this wont work
 if [ "$EUID" -ne 0 ]; then
   echo "Run with sudo: sudo $0"
