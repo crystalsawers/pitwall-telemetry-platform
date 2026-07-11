@@ -126,7 +126,7 @@ resource "null_resource" "trigger_first_build" {
   }
 
   depends_on = [
-    google_cloudbuild_trigger.f1_build
+    google_cloudbuild_trigger.f1_build,
     google_artifact_registry_repository.f1_repo,
     google_artifact_registry_repository_iam_member.cloudbuild_writer
   ]
