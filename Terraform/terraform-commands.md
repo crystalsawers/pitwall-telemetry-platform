@@ -17,6 +17,8 @@ terraform apply
 
 Type 'yes' for the prompt when applying.
 
+**Note:** If you don't explicitly state the variables, It will prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to apply it. Simply just type in the credentials you had for the database and then type 'yes'. That's why I suggest you use the export commands. 
+
 
 ## Get rid of the infrastructure
 
@@ -32,7 +34,7 @@ cd ..
 rm -rf terraform
 ```
 
-**Note:** It will prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to destroy it. Simply just type in the credentials you had for the database and type 'yes'.
+**Note:** It may or may not prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to destroy it. Simply just type in the credentials you had for the database and type 'yes'.
 
 
 ---
