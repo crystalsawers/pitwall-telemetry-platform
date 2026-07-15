@@ -30,6 +30,8 @@ Thumbs.db
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
+terraform.tfvars
+*.tfvars
 
 # Testing
 .pytest_cache/
