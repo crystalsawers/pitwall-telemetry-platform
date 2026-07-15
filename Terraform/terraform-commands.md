@@ -15,7 +15,7 @@ terraform plan
 terraform apply
 ``` 
 
-Type 'yes' for the prompt when applying.
+Type 'yes' for the prompt when applying. Or you could use `terraform apply -auto-approve` to bypass the prompt.
 
 **Note:** If you don't explicitly state the variables, It will prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to apply it. Simply just type in the credentials you had for the database and then type 'yes'. That's why I suggest you use the export commands, and it is solely using environment variables. 
 
@@ -35,7 +35,7 @@ cd ..
 rm -rf terraform
 ```
 
-**Note:** It may or may not prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to destroy it. Simply just type in the credentials you had for the database and type 'yes'.
+**Note:** It may or may not prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to destroy it. Simply just type in the credentials you had for the database and type 'yes'.  Alternatively, use `terraform destroy -auto-approve` to bypass the prompt.
 
 
 ---
