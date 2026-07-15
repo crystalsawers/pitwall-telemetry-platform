@@ -19,6 +19,18 @@ Type 'yes' for the prompt when applying.
 
 **Note:** If you don't explicitly state the variables, It will prompt you to enter the database and Grafana credentials (password and username) first and a value for your consent to apply it. Simply just type in the credentials you had for the database and then type 'yes'. That's why I suggest you use the export commands. 
 
+Alternative command for inserting environment variables (and likely the better method): `terraform plan -var 'TF_VAR_db_username="your-db-username"' -var 'TF_VAR_db_password="your-db-password"' -var 'your-grafana-password"'`
+
+**Even better:** create a file called `terraform.tfvars`, and apply your variables like this:
+
+```
+db_password      = "your-password"
+db_username      = "your-username"
+grafana_password = "your-grafana-password"
+```
+It automatically loads the variables when running `terraform plan` or `terraform apply`.
+
+---
 
 ## Get rid of the infrastructure
 
