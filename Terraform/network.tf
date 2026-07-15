@@ -85,3 +85,19 @@ resource "google_compute_firewall" "allow_internal" {
 
   source_ranges = ["10.10.0.0/24"]
 }
+
+# CLOUD NAT (for private GKE nodes to reach internet)
+
+resource "google_compute_router" "nat_router" {
+  name    = "nat-router"
+  region  = "australia-southeast1"
+  network = google_compute_network.pitwall_vpc.name
+}
+
+resource "google_compute_router_nat" "nat" {
+  name                               = "nat-config"
+  router                             = google_compute_router.nat_router.name
+  region                             = "australia-southeast1"
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+}
