@@ -1,8 +1,8 @@
-# Pitwall Telemetry Platform
+# Google Cloud Free Trial Project: Pitwall Telemetry Platform
 
 The **Pitwall Telemetry Platform** is a cloud-native telemetry and data platform inspired by **Formula 1 systems**, built on **Google Cloud** using modern DevOps, infrastructure-as-code, and microservices architecture principles.
 
-_Project timeframe: 9 May 2026 - Present_
+_Project timeframe: 9 May 2026 - 20 July 2026 (Free Trial ended 8 August 2026)_
 
 ---
 
@@ -20,7 +20,7 @@ The goal is to demonstrate practical skills in:
 - Observability and system design
 
 ---
-## ☁️ Infrastructure
+## Infrastructure
 
 The system is currently built on the **Google Compute Engine**, otherwise known as the Virtual Machine. There weill be further developments on this, potentially migrating to Kubernetes later.
 
@@ -51,7 +51,6 @@ The system is currently built on the **Google Compute Engine**, otherwise known 
 ### Automation & CI/CD
 - GitHub Actions for deployment pipelines
 - Bash scripting for operational automation
-- Cron jobs for scheduled tasks and maintenance
 
 ### Base Operating Environment
 - Ubuntu Server (headless Linux environment)
@@ -59,7 +58,7 @@ The system is currently built on the **Google Compute Engine**, otherwise known 
 
 ---
 
-## ⚠️ Free Tier Constraints
+## Free Tier Constraints
 
 This project is designed within Google Cloud free-tier limitations.
 
@@ -70,7 +69,7 @@ Key constraints include:
 - Avoiding unnecessary always-on services
 - Using only Google-owned AI models in the Agent Platform (e.g. Gemini)
 
-To manage this:
+To manage costs:
 - Resources are kept minimal and modular
 - Services are scaled down when not in use
 - Automation is used to prevent idle resource costs
@@ -79,7 +78,7 @@ To manage this:
 
 ## Development Phases
 
-This project is broken down into several phases, documented as a blog series. This was initially planned as a 3-part series, but has been extended to 4 parts, with a potential 5th depending on time and remaining Google Cloud credits.
+This project is broken down into several phases, documented as a blog series. This was initially planned as a 3-part series, but has been extended to 5 parts.
 
 ---
 
@@ -235,11 +234,12 @@ This project is broken down into several phases, documented as a blog series. Th
 
 ---
 
-### Part 5 - Infrastructure as Code (Phase 13)
+### Part 5 - Infrastructure as Code with Terraform (Phase 13)
 
-📘 Docs: (coming soon)
+📘 Docs: [/docs/phase 13.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%2013.md)
 
-📝 Blog: (coming soon)
+📝 Blog: [The Art of Google Cloud (Part 5)]()
+
 
 #### Phase 13 - Terraform
 
@@ -247,13 +247,5 @@ This project is broken down into several phases, documented as a blog series. Th
 * Virtual Machine (VM) provisioning on Compute Engine
 * Google Kubernetes Engine (GKE) cluster deployment
 * Cloud Run service configuration and deployment
-* Cloud SQL instance provisioning (PostgreSQL/MySQL)
+* Cloud SQL instance provisioning (PostgreSQL)
 * IAM roles, policies, and service accounts
-
----
-
-## Current Status
-
-**Phase 12:**  Pub/Sub, DONE
-
-**Next Phase:** Phase 13 - Terraform
