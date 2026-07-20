@@ -2,7 +2,7 @@
 
 *Project Timeframe: 9 May 2026 – 20 July 2026 (Free Trial ended 8 August 2026)*
 
-*Link to blog post:* coming soon
+*Link to blog post:* [The Art of Google Cloud (Part 5)](https://loglapandover.co.nz/projects/devops/jKUVuRSplMJR537Fbju1)
 
 *Links to Parts 1-4 of "The Art of Google Cloud": [Part 1](https://loglapandover.co.nz/projects/devops/P9McSw1XKxtBUFpzdg4g), [Part 2](https://loglapandover.co.nz/projects/devops/rUzNh2L9nTWgyQQjpVf3), [Part 3](https://loglapandover.co.nz/projects/devops/8RA0vlrnQM9lmk8gUg8t), [Part 4](https://loglapandover.co.nz/projects/devops/kA5uQMYizopqajwZhh2E)*
 

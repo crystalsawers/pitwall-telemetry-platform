@@ -238,7 +238,7 @@ This project is broken down into several phases, documented as a blog series. Th
 
 📘 Docs: [/docs/phase 13.md](https://github.com/crystalsawers/pitwall-telemetry-platform/blob/main/docs/phase%2013.md)
 
-📝 Blog: [The Art of Google Cloud (Part 5)]()
+📝 Blog: [The Art of Google Cloud (Part 5)](https://loglapandover.co.nz/projects/devops/jKUVuRSplMJR537Fbju1)
 
 
 #### Phase 13 - Terraform
